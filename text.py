@@ -13,5 +13,12 @@ def quit(event):
   print( "bye now\n" )
   exit()
 
+# for modifier docu see http://search.cpan.org/~ni-s/Tk-804.027/pod/bind.pod#MODIFIERS
 root.bind("<Control-q>", quit)
+
+def selected(event):
+    print("UMMM\n")
+
+# calls selected whenever the selection changes
+text.bind("<<Selection>>", selected)
 root.mainloop()

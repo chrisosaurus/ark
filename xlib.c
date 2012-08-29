@@ -1,5 +1,6 @@
 #include <X11/Xlib.h> /* Every Xlib program must include this */
 #include <assert.h> /* FIXME testing return values the lazy way */
+#include <string.h>
 
 #define NIL (0)
 /* following http://tronche.com/gui/x/xlib-tutorial/2nd-program-anatomy.html */
@@ -28,6 +29,23 @@ int main(){
     /* create a "graphics context" */
     GC gc = XCreateGC(dpy, w, 0, NIL);
 
+
+    /* FIXME going off course */
+    /* see  http://user.xmission.com/~georgeps/documentation/tutorials/Xlib_Beginner.html */
+    XColor green_color;
+    Colormap colormap = DefaultColormap(dpy, 0);
+    char green[] = "#00FF00";
+
+    /* parse the color green and allocated for later use */
+    XParseColor(dpy, colormap, green, &green_color);
+    XAllocColor(dpy, colormap, &green_color);
+    /* set foreground color of the graphics context
+     * green_color.pixel is the pixel value of the color allocated
+     */
+    XSetForeground(dpy, gc, green_color.pixel);
+    /* back on course */
+
+
     /* wait for the MapNotify event */
     XEvent e;
     for(;;){
@@ -39,6 +57,10 @@ int main(){
     /* draw a line */
     /* from (10,60), to (180,20) */
     XDrawLine(dpy, w, gc, 10, 60, 180, 20);
+
+    /* deviation: trying to draw a string */
+    char *hello = "hello world";
+    XDrawString(dpy, w, gc, 20, 30, hello, strlen(hello));
 
     /* send the drawline request to the server */
     /* NB: XNextevent performs an implicit XFlush before trying to read events */

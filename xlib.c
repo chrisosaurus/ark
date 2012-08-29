@@ -29,22 +29,26 @@ int main(){
     /* create a "graphics context" */
     GC gc = XCreateGC(dpy, w, 0, NIL);
 
+    Pixmap pixmap = XCreatePixmap(dpy, w, 100, 100, 1); /* FIXME should I use w or DefaultRootWindow(dpy) for offscreen? */
+    GC pgc = XCreateGC(dpy, pixmap, 0, NIL);
+    GC wgc = XCreateGC(dpy, pixmap, 0, NIL);
 
-    /* FIXME going off course */
+
     /* see  http://user.xmission.com/~georgeps/documentation/tutorials/Xlib_Beginner.html */
-    XColor green_color;
+    XColor blue_color;
     Colormap colormap = DefaultColormap(dpy, 0);
-    char green[] = "#00FF00";
+    char blue[] = "#0000FF";
 
     /* parse the color green and allocated for later use */
-    XParseColor(dpy, colormap, green, &green_color);
-    XAllocColor(dpy, colormap, &green_color);
+    XParseColor(dpy, colormap, blue, &blue_color);
+    XAllocColor(dpy, colormap, &blue_color);
     /* set foreground color of the graphics context
      * green_color.pixel is the pixel value of the color allocated
      */
-    XSetForeground(dpy, gc, green_color.pixel);
-    /* back on course */
+    XSetForeground(dpy, gc, blue_color.pixel);
+    XSetForeground(dpy, pgc, blue_color.pixel);
 
+    XMapWindow(dpy, w);
 
     /* wait for the MapNotify event */
     XEvent e;
@@ -58,9 +62,13 @@ int main(){
     /* from (10,60), to (180,20) */
     XDrawLine(dpy, w, gc, 10, 60, 180, 20);
 
-    /* deviation: trying to draw a string */
-    char *hello = "hello world";
-    XDrawString(dpy, w, gc, 20, 30, hello, strlen(hello));
+    /* create a pixmap, draw to it, and swap it to window */
+    char *string = "hello world I am some awesome text";
+    //int width = XTextWidth(None, string, strlen(string)); // FIXME segfaults
+    XFillRectangle(dpy, pixmap, wgc, 0, 0, 100, 100);
+    XDrawString(dpy, pixmap, pgc, 20, 30, string, strlen(string));
+    XCopyPlane(dpy, pixmap, w, gc, 0, 0, 100, 100, 0, 0, 1);
+    XSync(dpy, False);
 
     /* send the drawline request to the server */
     /* NB: XNextevent performs an implicit XFlush before trying to read events */
@@ -69,3 +77,25 @@ int main(){
     /* wait for 10 seconds so it is displayed */
     sleep(10);
 }
+
+/* NOTES from http://fixunix.com/x/346539-write-xlib-textbox-application-without-widgets.html
+ 1. measure the text with XTextWidth()
+
+ 2. use XCreateWindow to create a window or subwindow with padding for
+ around the text.
+
+ 3. create a Pixmap with XCreatePixmap() that is the size of the window.
+
+ 4. use XFillRectangle to draw a background for the Pixmap.
+
+ 5. XDrawText(), or XDrawString, or XDrawImageString on the Pixmap.
+
+ 6. Use XCopyArea to copy the Pixmap to the Window.
+
+ 7. call XMapWindow
+
+ 8. call XFlush
+
+ 9. save the Pixmap and copy the Pixmap to the Window whenever you
+ receive an Expose event.
+ */

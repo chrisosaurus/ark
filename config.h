@@ -14,7 +14,8 @@ static const char normfbcolor[] = "#eeeeee";
 static const char *blahcmd[] = {"blah"};
 
 /* key definitions */
-#define MODKEY Mod4Mask
+/* Mod1Mask is alt, Mod4Mask is windows key */
+#define MODKEY Mod1Mask
 
 /* key bindings */
 static Key keys[] = {

@@ -9,6 +9,20 @@
 
 #include "ark.h"
 
+typedef union Arg Arg;
+union Arg{
+	int i;
+	void *v;
+};
+
+typedef struct Key Key;
+struct Key{ /* structure used in config.h to bind a function to a key */
+	int mods; /* modifiers */
+	KeySym keysym; /* keysym to bind to */
+	void (*f_func) (const Arg *arg); /* function to call */
+	const Arg arg; /* argument to pass */
+};
+
 /* calling this will cause ui_mainloop to return */
 void ui_stop();
 

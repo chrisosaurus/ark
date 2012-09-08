@@ -1,0 +1,5 @@
+llist.h and .c define a linked list, this is purely a model
+ark.h and .c define the editor, it's commands, main functions, setup and teardown
+ui.h and .c define the mainloop, command bindings, and event handlers
+
+

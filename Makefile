@@ -5,7 +5,7 @@
 
 include config.mk
 
-SRC = ark.c
+SRC = llist.c ui.c ark.c
 OBJ = ${SRC:.c=.o}
 
 all: options ark 

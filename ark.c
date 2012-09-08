@@ -1,26 +1,29 @@
-#include <stdlib.h> /* malloc family */
-#include <string.h> /* strlen */
-#include <stdio.h> /* printf, puts */
-#include <assert.h> /* assert */
+#include "ark.h"
 
-#include <X11/Xlib.h>
-#include <X11/keysym.h> /* XK_*, used in config.h */
+/* declaration of bindable functions */
+void
+f_quit(){
+	running = 0;
+}
 
-/* Argument for functions bound to key presses */
-typedef union {
-	int i; /* FIXME what do */
-} Arg;
+/* internal functions */
+void
+setup(){
+}
 
-/* key bindings defined in config.h */
-typedef struct {
-	unsigned int mod; /* modifiers */
-	KeySym keysym; /* key */
-	void (*func)(const Arg *); /* function to call */
-	const Arg arg; /* arg to pass to function */
-} Key;
+void
+teardown(){
+}
 
-#include "config.h" /* include our configuration */
+int /* handle args, setup and then being mainloop */
+main(int argc, char **argv){
+	running = 1;
 
-int
-main(){
+	setup();
+	ui_setup();
+	ui_mainloop();
+	ui_teardown();
+	teardown();
+
+	return 0;
 }

@@ -1,28 +1,95 @@
 #include "ui.h"
 
 /** state variables **/
-Display *dpy=0;
-Window window;
-Pixmap pixmap;
-GC wingc, pixgc;
-int width=400, height=400; /* default dimensions */
+static Display *dpy=0;
+static Window window;
+static XWindowAttributes wa;
+static Pixmap pixmap;
+static GC wingc, pixgc;
+static int width=400, height=400; /* default dimensions */
+static int black_color, white_color;
+static int events = StructureNotifyMask /* MapNotify, ConfigureNotify */
+			| KeyPressMask /* KeyPress, KeyRelease */
+			| ExposureMask /* Expose */
+			| EnterWindowMask /* EnterNotify */
+			| FocusChangeMask /* FocusIn */
+			| KeymapStateMask /* KeymapNotify (follows EnterNotify and FocusIn events) */
+			;
+/* set by ui_setup and ui_stop, if 0 then ui_mainloop will return */
 int running = 0;
 
 /* event handlers */
-void keypress(XEvent *e){}
+static void
+keypress(XEvent *e){
+}
+
+static void
+configure(XEvent *e){
+	/* we could get the width and height from e.configure, but we need the depth from the window anyway */
+	XGetWindowAttributes(dpy, window, &wa);
+	width = wa.width;
+	height = wa.height;
+
+	/* free old pixmap and assosiated graphics context */
+	XFreeGC(dpy, pixgc);
+	XFreePixmap(dpy, pixmap);
+
+	/* create a new pixmap and graphics context */
+	pixmap = XCreatePixmap(dpy, window, wa.width, wa.height, wa.depth);
+	pixgc = XCreateGC(dpy, pixmap, 0, NULL);
+
+	/* FIXME TODO now what ? */
+	/* should we cause a draw */
+}
+
 /* array of handlers indexed by XEvent.type */
 static void (* handler[LASTEvent]) (XEvent *) = {
-	[KeyPress] = keypress
+	[KeyPress] = keypress,
+	[ConfigureNotify] = configure
 };
+
+/** internal functions **/
+
+
+/** external interface **/
+void /* cause ui_mainloop to return */
+ui_stop(){
+	running = 0;
+}
 
 void
 ui_setup(){
-	running = 1; /* FIXME this may need to be visible from within ark.c, commands may want to quit, should we really set this? */
+	running = 1;
+
+	/* open connection and get black and white colours */
 	dpy = XOpenDisplay(NULL);
+	black_color = BlackPixel(dpy, DefaultScreen(dpy));
+	white_color = WhitePixel(dpy, DefaultScreen(dpy));
+
+	/* create window and get attributes */
+	window = XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 0, 0, width, height, 0, black_color, white_color);
+	XGetWindowAttributes(dpy, window, &wa);
+
+	/* define out pixmap */
+	pixmap = XCreatePixmap(dpy, window, wa.width, wa.height, wa.depth);
+
+	/* create our graphic contexts */
+	wingc = XCreateGC(dpy, window, 0, NULL);
+	pixgc = XCreateGC(dpy, pixmap, 0, NULL);
+
+	/* clear our pixmap, FIXME do this inside a draw function instead */
+	XSetForeground(dpy, pixgc, white_color);
+	XFillRectangle(dpy, pixmap, pixgc, 0, 0, wa.width, wa.height);
+	XSetForeground(dpy, pixgc, black_color);
+
+	/* select the events we are interested in and map the window */
+	XSelectInput(dpy, window, events);
+	XMapWindow(dpy, window);
 }
 
 void
 ui_teardown(){
+	XFreePixmap(dpy, pixmap);
 	XFreeGC(dpy, wingc); /* may fail but do we care? */
 	XFreeGC(dpy, pixgc);
 	XCloseDisplay(dpy);

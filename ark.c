@@ -3,21 +3,20 @@
 /* declaration of bindable functions */
 void
 f_quit(){
-	running = 0;
+	ui_stop();
 }
 
 /* internal functions */
-void
+static void
 setup(){
 }
 
-void
+static void
 teardown(){
 }
 
 int /* handle args, setup and then being mainloop */
 main(int argc, char **argv){
-	running = 1;
 
 	setup();
 	ui_setup();

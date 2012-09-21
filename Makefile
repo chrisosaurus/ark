@@ -5,6 +5,7 @@
 
 include config.mk
 
+HEADERS = config.def.h llist.h ui.h ark.h
 SRC = llist.c ui.c ark.c
 OBJ = ${SRC:.c=.o}
 
@@ -37,8 +38,8 @@ clean:
 dist: clean
 	@echo creating dist tarball
 	@mkdir -p ark-${VERSION}
-	@cp -R LICENSE Makefile config.mk config.def.h \
-		README TODO ark.1 codes.h ${SRC} ark-${VERSION}
+	@cp -R LICENSE Makefile config.mk ${HEADERS} \
+		${SRC} ark-${VERSION}
 	@tar -cf ark-${VERSION}.tar ark-${VERSION}
 	@gzip ark-${VERSION}.tar
 	@rm -rf ark-${VERSION}

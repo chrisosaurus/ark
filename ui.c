@@ -20,7 +20,7 @@ static int events = StructureNotifyMask /* MapNotify, ConfigureNotify */
 			| KeymapStateMask /* KeymapNotify (follows EnterNotify and FocusIn events) */
 			;
 /* set by ui_setup and ui_stop, if 0 then ui_mainloop will return */
-int running = 0;
+static int running = 0;
 
 /* event handlers */
 static void

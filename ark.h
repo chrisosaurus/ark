@@ -2,6 +2,7 @@
 #define ark_h
 
 #include "ui.h"
+#include "llist.h"
 
 /** bindable Functions **/
 void f_quit();

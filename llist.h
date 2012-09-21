@@ -3,11 +3,15 @@
 
 #include <stdio.h>
 
+/* lines are allocated with lenghts that are multiples of LINESIZE */
+#define LINESIZE 80
+
 /* a Line of text */
 typedef struct Line Line;
 struct Line{
 	char *contents; /* \0 terminated, will include any '\n's */
-	int len; /* number of bytes excluding trailing \0 (not chars as utf8 characters are multibyte) */
+	int mul; /* the multiple of LINESIZE that is the capacity of this Line */
+	int len; /* number of bytes stored excluding trailing \0 (not chars as utf8 characters are multibyte) */
 	Line *next;
 	Line *prev;
 };
@@ -32,8 +36,12 @@ Pos m_nextline(Pos pos);
 Pos m_prevword(Pos pos);
 Pos m_nextword(Pos pos);
 
-/** helper functions **/
+/** llist functions **/
+void ll_setup();
+void ll_teardown();
 void load(FILE *f);
 void save(FILE *f);
+void insert(Pos pos, const char *str);
+Line* newline(int mul, Line *prev, Line *next);
 
 #endif

@@ -6,6 +6,7 @@
 include config.mk
 
 HEADERS = config.def.h llist.h ui.h ark.h
+# source
 SRC = llist.c ui.c ark.c
 OBJ = ${SRC:.c=.o}
 
@@ -31,9 +32,18 @@ ark: ${OBJ}
 	@echo CC -o $@
 	@${CC} -o $@ ${LDFLAGS} ${OBJ}
 
+test_llist: llist.o
+	@echo CC -o tests/test_llist.c
+	@${CC} -o tests/test_llist tests/test_llist.c llist.o -lcheck
+
+test: test_llist
+	@echo running test_llist
+	./tests/test_llist
+
 clean:
 	@echo cleaning
 	@rm -f ark ${OBJ} ark-${VERSION}.tar.gz
+	@rm -f tests/*.o tests/test_llist
 
 dist: clean
 	@echo creating dist tarball
@@ -60,4 +70,4 @@ uninstall:
 	@echo removing manual page from ${DESTDIR}${MANPREFIX}/man1
 	@rm -f ${DESTDIR}${MANPREFIX}/man1/ark.1
 
-.PHONY: all options clean dist install uninstall
+.PHONY: all options clean dist install uninstall test_llist test

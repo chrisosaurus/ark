@@ -1,4 +1,26 @@
+#include <stdlib.h>
+
 #include "llist.h"
+
+/* state */
+Pos fstart={0,0}, fend={0,0};
+
+/* management of Line(s) */
+/* where n_elems is the number of chars in the line */
+Line*
+newline(int mul, Line *prev, Line *next){
+	Line *l = malloc(sizeof(Line));
+	if( !l )
+		return 0; /* error */
+	l->prev = 0;
+	l->next = 0;
+	l->mul = mul;
+	l->len = 0;
+	l->contents = malloc( sizeof(char) * LINESIZE * mul );
+	if( ! l->contents )
+		return 0; /* error */
+	return l;
+}
 
 /* Movement functions */
 Pos
@@ -51,11 +73,15 @@ m_nextword(Pos pos){
 	return (Pos){0,0};
 }
 
-/** helper functions **/
+/** llist functions **/
 void
 load(FILE *f){
 }
 
 void
 save(FILE *f){
+}
+
+void
+insert(Pos pos, const char *str){
 }

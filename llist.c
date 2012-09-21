@@ -82,6 +82,6 @@ void
 save(FILE *f){
 }
 
-void
+Pos
 insert(Pos pos, const char *str){
 }

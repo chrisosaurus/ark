@@ -20,7 +20,7 @@ struct Line{
 typedef struct Pos Pos;
 struct Pos{
 	Line *line;
-	int o; /* byte offset within line (not character offset due to utf8) */
+	int offset; /* byte offset within line (not character offset due to utf8) */
 };
 
 
@@ -41,7 +41,7 @@ void ll_setup();
 void ll_teardown();
 void load(FILE *f);
 void save(FILE *f);
-void insert(Pos pos, const char *str);
+Pos insert(Pos pos, const char *str);
 Line* newline(int mul, Line *prev, Line *next);
 
 #endif

@@ -1,4 +1,6 @@
 #include <stdlib.h>
+#include <stdio.h> /* FIXME testing */
+#include <string.h> /* strlen, memmove */
 
 #include "llist.h"
 
@@ -12,13 +14,14 @@ newline(int mul, Line *prev, Line *next){
 	Line *l = malloc(sizeof(Line));
 	if( !l )
 		return 0; /* error */
-	l->prev = 0;
-	l->next = 0;
+	l->prev = prev;
+	l->next = next;
 	l->mul = mul;
 	l->len = 0;
 	l->contents = malloc( sizeof(char) * LINESIZE * mul );
 	if( ! l->contents )
 		return 0; /* error */
+	l->contents[0] = 0;
 	return l;
 }
 
@@ -84,4 +87,18 @@ save(FILE *f){
 
 Pos
 insert(Pos pos, const char *str){
+	int i=0, l=strlen(str);
+	/* FIXME doesnt handle \n*/
+	for( i=0; i<l; ++i ){
+		if( pos.line->len + 2 > pos.line->mul * LINESIZE ){
+			pos.line->contents = realloc(pos.line->contents, ++pos.line->mul * LINESIZE);
+			if( ! pos.line->contents )
+				return (Pos){0,0}; /* FIXME error */
+		}
+
+		memmove( &pos.line->contents[pos.offset+1], & pos.line->contents[pos.offset], pos.line->len - pos.offset + 1 );
+		pos.line->contents[pos.offset++] = str[i];
+		++pos.line->len;
+	}
+	return pos;
 }

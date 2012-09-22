@@ -5,16 +5,8 @@
 Line *line;
 
 START_TEST (test_llist_newline){
-	line = newline(3, 0, 0);
-	fail_unless( line != 0, "newline failed" );
-	fail_unless( line->mul == 3, "length set incorrectly" );
-	fail_unless( line->prev == 0, "prev not set correctly" );
-	fail_unless( line->next== 0, "next not set correctly" );
-}
-END_TEST
+	Line *nl = newline(4, line, 0);
 
-START_TEST (test_llist_newline_more){
-	Line *nl = newline(4, 0, 0);
 	fail_unless( nl->mul == 4, "newline mul set incorrectly" );
 	fail_unless( nl->prev == line, "newline prev set incorrectly" );
 	fail_unless( nl->next == 0, "newline next set incorrectly" );
@@ -25,11 +17,38 @@ END_TEST
 START_TEST (test_llist_insert){
 	char *str = "hello world";
 	Pos p = {line, 0};
+
 	p = insert(p, str);
-	/* FIXME these currently segfault */
+	/* len should be the same as strlen, neither takes \0 into account */
 	fail_unless( line->len == strlen(str), "length after insert is incorrect (strlen of str)" );
 	fail_unless( line->len == strlen(line->contents), "length after insert is incorrect (strlen of contents)" );
 	fail_unless( line->mul * LINESIZE > line->len, "mul after insert is incorrect" );
+	fail_if ( strcmp(str, line->contents), "contents do not match inserted text" );
+}
+END_TEST
+
+START_TEST (test_llist_insert_realloc){
+	char *str = "hello world";
+	Pos p = {line, 0};
+	int i=0;
+
+	/* keep inserting until we realloc */
+	for( i=0; p.line->mul<2; ++i ){
+		p = insert(p, str);
+	}
+	fail_unless( strlen(p.line->contents) == i*strlen(str), "multiple inserts failed" );
+
+}
+END_TEST
+
+START_TEST (test_llist_insert_newline){
+	char *str="hello\nworld";
+	Pos p = {line, 0};
+	p = insert(p, str);
+	/* '\n'(s) should appear in the text */
+	fail_unless( strlen(p.line->contents) == strlen("hello\n"), "inserting hello\\n failed" );
+	fail_unless( p.line->next != 0, "inserting \\n failed to create a newline" );
+	fail_unless( strlen(p.line->next->contents) == strlen("world"), "newline doesnt match expected text ('world')" );
 }
 END_TEST
 
@@ -48,6 +67,11 @@ END_TEST
 
 void
 llist_setup(){
+	line = newline(1, 0, 0);
+	fail_unless( line != 0, "newline failed" );
+	fail_unless( line->mul == 1, "length set incorrectly" );
+	fail_unless( line->prev == 0, "prev not set correctly" );
+	fail_unless( line->next== 0, "next not set correctly" );
 }
 
 void
@@ -67,8 +91,9 @@ llist_suite(void){
 	tcase_add_checked_fixture(tc_newline, llist_setup, llist_teardown);
 
 	tcase_add_test(tc_newline, test_llist_newline);
-	tcase_add_test(tc_newline, test_llist_newline_more);
 	tcase_add_test(tc_newline, test_llist_insert);
+	tcase_add_test(tc_newline, test_llist_insert_realloc);
+	tcase_add_test(tc_newline, test_llist_insert_newline);
 	tcase_add_test(tc_newline, test_llist_movement);
 
 	suite_add_tcase(s, tc_newline);

@@ -65,6 +65,13 @@ START_TEST (test_llist_movement){
 	fail_unless( p.line == line, "endofline moved off line" );
 	/* character is where to insert next, so end of line is after the last char and before the \0 */
 	fail_unless( p.offset == strlen(line->contents) + 1, "endofline did not move to end of line" );
+
+	p = insert(p, "\n\n");
+	p = m_startoffile(p);
+	fail_unless( p.line == line, "start of file is not line");
+
+	p = m_endoffile(p);
+	fail_unless( p.line == line->next->next, "end of file is not expected line");
 }
 END_TEST
 

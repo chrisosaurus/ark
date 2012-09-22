@@ -45,10 +45,12 @@ START_TEST (test_llist_insert_newline){
 	char *str="hello\nworld";
 	Pos p = {line, 0};
 	p = insert(p, str);
+
 	/* '\n'(s) should appear in the text */
-	fail_unless( strlen(p.line->contents) == strlen("hello\n"), "inserting hello\\n failed" );
-	fail_unless( p.line->next != 0, "inserting \\n failed to create a newline" );
-	fail_unless( strlen(p.line->next->contents) == strlen("world"), "newline doesnt match expected text ('world')" );
+	fail_unless( strlen(line->contents) == strlen("hello\n"), "inserting hello\\n failed" );
+	fail_unless( line->next != 0, "inserting \\n failed to create a newline" );
+	fail_unless( strlen(p.line->contents) == strlen("world"), "newline doesnt match expected text ('world')" );
+	fail_unless( p.line->prev == line, "newline prev doesnt match line" );
 }
 END_TEST
 
@@ -61,7 +63,8 @@ START_TEST (test_llist_movement){
 
 	p = m_endofline(p);
 	fail_unless( p.line == line, "endofline moved off line" );
-	fail_unless( p.offset == strlen(line->contents), "endofline did not move to end of line" );
+	/* character is where to insert next, so end of line is after the last char and before the \0 */
+	fail_unless( p.offset == strlen(line->contents) + 1, "endofline did not move to end of line" );
 }
 END_TEST
 

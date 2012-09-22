@@ -28,12 +28,12 @@ newline(int mul, Line *prev, Line *next){
 /* Movement functions */
 Pos
 m_startofline(Pos pos){
-	return (Pos){0,0};
+	return (Pos){pos.line,0};
 }
 
 Pos
 m_endofline(Pos pos){
-	return (Pos){0,0};
+	return (Pos){pos.line, pos.line->len + 1};
 }
 
 Pos
@@ -58,12 +58,12 @@ m_nextchar(Pos pos){
 
 Pos
 m_prevline(Pos pos){
-	return (Pos){0,0};
+	return (Pos){pos.line->prev, 0};
 }
 
 Pos
 m_nextline(Pos pos){
-	return (Pos){0,0};
+	return (Pos){pos.line->next, 0};
 }
 
 Pos
@@ -88,8 +88,8 @@ save(FILE *f){
 Pos
 insert(Pos pos, const char *str){
 	int i=0, l=strlen(str);
-	/* FIXME doesnt handle \n*/
 	for( i=0; i<l; ++i ){
+		/* handle resizing */
 		if( pos.line->len + 2 > pos.line->mul * LINESIZE ){
 			pos.line->contents = realloc(pos.line->contents, ++pos.line->mul * LINESIZE);
 			if( ! pos.line->contents )
@@ -97,8 +97,24 @@ insert(Pos pos, const char *str){
 		}
 
 		memmove( &pos.line->contents[pos.offset+1], & pos.line->contents[pos.offset], pos.line->len - pos.offset + 1 );
-		pos.line->contents[pos.offset++] = str[i];
+		pos.line->contents[pos.offset] = str[i];
 		++pos.line->len;
+		++pos.offset;
+
+		/* handle \n in str */
+		if( str[i] == '\n' ){
+			Line *nl = newline(1, pos.line, pos.line->next);
+			if( ! nl )
+				return (Pos){0,0}; /* FIXME error */
+			pos.line->next = nl;
+
+			/* copy over old contents */
+			insert( (Pos){nl, 0}, &pos.line->contents[pos.offset] );
+			/* add a null character */
+			pos.line->contents[pos.offset] = 0;
+			/* carry on from the start of the next line */
+			pos = (Pos){nl, 0};
+		}
 	}
 	return pos;
 }

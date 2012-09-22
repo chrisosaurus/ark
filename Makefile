@@ -6,7 +6,6 @@
 include config.mk
 
 HEADERS = config.def.h llist.h ui.h ark.h
-# source
 SRC = llist.c ui.c ark.c
 OBJ = ${SRC:.c=.o}
 

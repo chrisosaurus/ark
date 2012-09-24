@@ -98,12 +98,13 @@ START_TEST (test_llist_save){
 	char *str = "hello\nthere \n\nworld";
 	FILE *f = fopen(path, "w");
 	Pos p = insert( (Pos){line, 0}, str );
-	save( (Pos){line,0}, (Pos){0, 0}, f);
+	save(f);
 	fclose(f);
 	f = fopen(path, "r");
-	char read[20];
-	fscanf(f, "%20s", read);
-	fail_if( strcmp(str, read), "contents read from file did not match expected" );
+	char buf[20];
+	fread(buf, sizeof(char), 20, f);
+	buf[19] = 0;
+	fail_if( strcmp(str, buf), "contents read from file did not match expected" );
 }
 END_TEST
 

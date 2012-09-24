@@ -39,8 +39,8 @@ Pos m_nextword(Pos pos);
 /** llist functions **/
 void ll_setup();
 void ll_teardown();
-Pos load(Pos into, FILE *f);
-void save(Pos from, Pos to, FILE *f);
+Pos load(Pos into, FILE *f); /* load file starting at position into */
+void save(FILE *f); /* write entire llist to file f */
 Pos insert(Pos pos, const char *str);
 Line* newline(int mul, Line *prev, Line *next);
 

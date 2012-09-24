@@ -1,4 +1,3 @@
-llist save
 ui text box (from llist)
 ui keypress -> llist insert
 ui mouse cursor placement

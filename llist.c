@@ -87,7 +87,7 @@ m_nextword(Pos pos){
 }
 
 /** llist functions **/
-Pos
+Pos /* read file and insert at position pos */
 load(Pos pos, FILE *f){
 	int read;
 	/* +1 as we need a \0, [read+1] will be \0 */
@@ -104,11 +104,15 @@ load(Pos pos, FILE *f){
 	return pos;
 }
 
-void
-save(Pos from, Pos to, FILE *f){
+void /* write entire llist to file f */
+save(FILE *f){
+	Line *l;
+	for( l=fstart.line ; l; l=l->next ){
+		fwrite(l->contents, sizeof(char), l->len, f);
+	}
 }
 
-Pos
+Pos /* insert str at position pos */
 insert(Pos pos, const char *str){
 	/* inserts character by character, performs far too many memmoves but is simple */
 

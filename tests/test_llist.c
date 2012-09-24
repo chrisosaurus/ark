@@ -2,6 +2,8 @@
 #include <check.h>
 #include "../llist.h"
 
+/* path to use for testing file io */
+char *path = "tests/testing_data";
 Line *line;
 
 START_TEST (test_llist_newline){
@@ -66,6 +68,7 @@ START_TEST (test_llist_movement){
 	/* character is where to insert next, so end of line is after the last char and before the \0 */
 	fail_unless( p.offset == strlen(line->contents) + 1, "endofline did not move to end of line" );
 
+	p = m_startoffile(p);
 	p = insert(p, "\n\n");
 	p = m_startoffile(p);
 	fail_unless( p.line == line, "start of file is not line");
@@ -75,11 +78,41 @@ START_TEST (test_llist_movement){
 }
 END_TEST
 
+START_TEST (test_llist_load){
+	char *str = "hello\nthere \n\nworld";
+	FILE *f = fopen(path, "w");
+	fwrite(str, sizeof(char), strlen(str), f);
+	fclose(f);
+	f = fopen(path, "r");
+	load( (Pos){line,0}, f);
+
+	fail_if( strcmp(line->contents, "hello\n"), "line contents did not match expected ('hello\\n')" );
+	fail_if( strcmp(line->next->contents, "there \n"), "line->next contents did not match expected ('there \\n')" );
+	fail_if( strcmp(line->next->next->contents, "\n"), "line->next->next contents did not match expected ('\\n')" );
+	fail_if( strcmp(line->next->next->next->contents, "world"), "l->n->n->n->c did not match expected ('world')" );
+	fail_if( line->next->next->next->next != 0, "more lines in llist than expected" );
+}
+END_TEST
+
+START_TEST (test_llist_save){
+	char *str = "hello\nthere \n\nworld";
+	FILE *f = fopen(path, "w");
+	Pos p = insert( (Pos){line, 0}, str );
+	save( (Pos){line,0}, (Pos){0, 0}, f);
+	fclose(f);
+	f = fopen(path, "r");
+	char read[20];
+	fscanf(f, "%20s", read);
+	fail_if( strcmp(str, read), "contents read from file did not match expected" );
+}
+END_TEST
+
 void
 llist_setup(){
 	line = newline(1, 0, 0);
 	fail_unless( line != 0, "newline failed" );
-	fail_unless( line->mul == 1, "length set incorrectly" );
+	fail_unless( line->mul == 1, "mul set incorrectly" );
+	fail_unless( line->len == 0, "length set incorrectly" );
 	fail_unless( line->prev == 0, "prev not set correctly" );
 	fail_unless( line->next== 0, "next not set correctly" );
 }
@@ -105,6 +138,8 @@ llist_suite(void){
 	tcase_add_test(tc_newline, test_llist_insert_realloc);
 	tcase_add_test(tc_newline, test_llist_insert_newline);
 	tcase_add_test(tc_newline, test_llist_movement);
+	tcase_add_test(tc_newline, test_llist_load);
+	tcase_add_test(tc_newline, test_llist_save);
 
 	suite_add_tcase(s, tc_newline);
 

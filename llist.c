@@ -1,8 +1,10 @@
-#include <stdlib.h>
-#include <stdio.h> /* FIXME testing */
+#include <stdio.h> /* perror */
+#include <stdlib.h> /* malloc, realloc */
 #include <string.h> /* strlen, memmove */
 
 #include "llist.h"
+
+#define BUFSIZE 80
 
 /* state */
 Pos fstart={0,0}, fend={0,0};
@@ -85,12 +87,25 @@ m_nextword(Pos pos){
 }
 
 /** llist functions **/
-void
-load(FILE *f){
+Pos
+load(Pos pos, FILE *f){
+	int read;
+	/* +1 as we need a \0, [read+1] will be \0 */
+	char buf[BUFSIZE+1];
+
+	while( (read = fread(buf, sizeof(char), BUFSIZE, f)) ){
+		if( read == EOF ){
+			printf("EOF\n");
+			return pos;
+		}
+		buf[read] = '\0';
+		pos = insert( pos, buf );
+	}
+	return pos;
 }
 
 void
-save(FILE *f){
+save(Pos from, Pos to, FILE *f){
 }
 
 Pos
@@ -110,6 +125,8 @@ insert(Pos pos, const char *str){
 
 		/* move old contents out of the way and insert character */
 		memmove( &pos.line->contents[pos.offset+1], & pos.line->contents[pos.offset], pos.line->len - pos.offset + 1 );
+
+
 		pos.line->contents[pos.offset] = str[i];
 		++pos.line->len;
 		++pos.offset;

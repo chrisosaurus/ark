@@ -12,15 +12,39 @@ static Pixmap pixmap;
 static GC wingc, pixgc;
 static int width=400, height=400; /* default dimensions */
 static int black_color, white_color;
-static int events = StructureNotifyMask /* MapNotify, ConfigureNotify */
-			| KeyPressMask /* KeyPress, KeyRelease */
-			| ExposureMask /* Expose */
-			| EnterWindowMask /* EnterNotify */
-			| FocusChangeMask /* FocusIn */
-			| KeymapStateMask /* KeymapNotify (follows EnterNotify and FocusIn events) */
-			;
+
 /* set by ui_setup and ui_stop, if 0 then ui_mainloop will return */
 static int running = 0;
+
+/* internal functions */
+static void /* draw the llist to the pixmap */
+draw(){
+	/* x=startx, y=starty
+	 * pos = {line, 0}
+	 * for( ; pos.line; ){
+	 * 	if not y + TextHeight( &pos.line[pos.offset] ) < height
+	 * 		break
+	 * 	if x + TextWidth( &pos.line[pos.offset] ) < width
+	 * 		draw line
+	 * 		y += TextHeight( &pos.line[pos.offset] )
+	 * 		pos.line = pos.line.next
+	 * 		pos.offset = 0
+	 * 	else
+	 * 		find highest offset that will fit within width
+	 * 		draw [pos - offset]
+	 * 		y += TextHeight( [pos - offset] ) + descent + ascent
+	 * 		pos = line, offset
+	 * 		record vlines
+	 *
+	 * consider Vlines and Vwidth (longest number of chars we have drawn so far)
+	 */
+	/* TODO */
+}
+
+static void /* copy the pixmap to the window */
+display(){
+	/* TODO */
+}
 
 /* event handlers */
 static void
@@ -94,8 +118,17 @@ ui_setup(){
 	XFillRectangle(dpy, pixmap, pixgc, 0, 0, wa.width, wa.height);
 	XSetForeground(dpy, pixgc, black_color);
 
-	/* select the events we are interested in and map the window */
-	XSelectInput(dpy, window, events);
+	/* select the events we are interested in */
+	XSelectInput(dpy, window, 
+				StructureNotifyMask /* MapNotify, ConfigureNotify */
+				| KeyPressMask /* KeyPress, KeyRelease */
+				| ExposureMask /* Expose */
+				| EnterWindowMask /* EnterNotify */
+				| FocusChangeMask /* FocusIn */
+				| KeymapStateMask /* KeymapNotify (follows EnterNotify and FocusIn events) */
+		);
+
+	/* map the window */
 	XMapWindow(dpy, window);
 }
 

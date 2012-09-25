@@ -23,25 +23,36 @@ struct Pos{
 	int offset; /* byte offset within line (not character offset due to utf8) */
 };
 
+/* a buffer of a file */
+typedef struct Buffer Buffer;
+struct Buffer{
+	Line *start, *end; /* first and last line */
+	Pos cursor; /* current cursor position within buffer */
+	char *path; /* relative path to file or 0 */
+};
 
-/** Movement functions **/
-Pos m_startofline(Pos pos);
-Pos m_endofline(Pos pos);
-Pos m_startoffile(Pos pos);
-Pos m_endoffile(Pos pos);
-Pos m_prevchar(Pos pos);
-Pos m_nextchar(Pos pos);
-Pos m_prevline(Pos pos);
-Pos m_nextline(Pos pos);
-Pos m_prevword(Pos pos);
-Pos m_nextword(Pos pos);
+/** Movement functions, adjust buf->cursor **/
+void m_startofline(Buffer *buf);
+void m_endofline(Buffer *buf);
+void m_startoffile(Buffer *buf);
+void m_endoffile(Buffer *buf);
+void m_prevchar(Buffer *buf);
+void m_nextchar(Buffer *buf);
+void m_prevline(Buffer *buf);
+void m_nextline(Buffer *buf);
+void m_prevword(Buffer *buf);
+void m_nextword(Buffer *buf);
 
 /** llist functions **/
-void ll_setup();
-void ll_teardown();
-Pos load(Pos into, FILE *f); /* load file starting at position into */
-void save(FILE *f); /* write entire llist to file f */
-Pos insert(Pos pos, const char *str);
+/* load file buf->path into buf, returns 0 on success and 1 on error */
+int load(Buffer *buf);
+/* save buf into file buf->path, returns 0 on success and 1 on error */
+int save(Buffer *buf);
+/* insert at cursor and move cursor along, returns 0 on success and 1 on error */
+int insert(Buffer *buf, const char *str);
+
+/** structure management **/
 Line* newline(int mul, Line *prev, Line *next);
+Buffer* newbuffer(char *path);
 
 #endif

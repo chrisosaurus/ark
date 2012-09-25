@@ -1,5 +1,16 @@
-ui text box (from llist)
-ui keypress -> llist insert
-ui mouse cursor placement
-ui mouse select
-llist delete
+features:
+	ui text box (from llist)
+	ui keypress -> llist insert
+	ui mouse cursor placement
+	ui mouse select
+	llist delete
+
+technical debt:
+	NONE!
+
+consider:
+	relationship between llist and ui/ark, both need to 'see' the llist.
+		both can modify it (ui handles key presses, could pass off to ark)
+		ui needs to be able to draw it (and only it knows when to draw)
+		ark needs to be able to modify it
+		llist needs to be able to save it

@@ -51,6 +51,7 @@ int save(Buffer *buf);
 /* insert at cursor and move cursor along, returns 0 on success and 1 on error */
 /* recursive specified the behavior of \n */
 int insert(Buffer *buf, const char *str, int recursive);
+void backspace(Buffer *buf);
 
 /** structure management **/
 Line* newline(int mul, Line *prev, Line *next);

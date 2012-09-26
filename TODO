@@ -3,9 +3,7 @@ features:
 	ui cursor movement
 	ui mouse cursor placement
 	ui mouse select
-	llist delete
 
 technical debt:
-	handling drawing of newline and tabs
 
 consider:

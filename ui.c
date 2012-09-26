@@ -1,3 +1,4 @@
+#include <stdlib.h> /* calloc, free */
 #include "ui.h"
 #include "config.h"
 
@@ -123,6 +124,28 @@ display(){
 	XFlush(dpy);
 }
 
+static char* /* return a string of this KeySym, caller must free returned char* */
+keysym_to_charp(KeySym keysym){
+	char *cp = calloc(sizeof(char), 2);
+	/* need a nicer mapping */
+	switch(keysym){
+		case XK_Return:
+			cp[0] = '\n';
+			break;
+		case XK_BackSpace:
+			backspace(buf);
+			break;
+		default:
+		 	/* Latin 1, see /usr/include/X11/keysymdef.h
+		 	*  need to extend later to be unicode aware
+		 	*/
+			if( keysym < 0x0100 )
+				cp[0] = keysym;
+			break;
+	}
+	return cp;
+}
+
 /* event handlers */
 static void
 keypress(XEvent *e){
@@ -138,17 +161,21 @@ keypress(XEvent *e){
 		}
 	}
 
-	//if( ! keyevent.state ){ /* this if doesn't do what I want it to.. */
+	if( keyevent.keycode == 0xffe9 ){
+		printf("keycode is shift\n");
+	}
+	if( ! keyevent.state || keyevent.state & ShiftMask ){
+		keysym = XKeycodeToKeysym(dpy, keyevent.keycode, (keyevent.state & ShiftMask));
 		/* FIXME TODO This is all testing... */
 		/* this doesnt deal with newlines */
 		/* see /usr/include/X11/keysymdef.h */
-		char str[2] = {keysym, 0};
-		if( keysym == XK_Return )
-			str[0] = '\n';
+
+		char *str = keysym_to_charp(keysym);
 		insert(buf, str, 0);
+		free(str);
 		draw();
 		display();
-	//}
+	}
 }
 
 static void

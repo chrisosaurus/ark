@@ -120,7 +120,7 @@ START_TEST (test_llist_save){
 	int ret;
 
 	ret = insert( buf, str, 0 );
-	fail_if( ret, "insert returned non-0 in test_llist_save", 0);
+	fail_if( ret, "insert returned non-0 in test_llist_save");
 	save(buf);
 
 	FILE *f = fopen(path, "r");
@@ -128,6 +128,22 @@ START_TEST (test_llist_save){
 	fread(tmp, sizeof(char), 19, f);
 	tmp[19] = 0;
 	fail_if( strcmp(str, tmp), "contents read from file did not match expected" );
+}
+END_TEST
+
+START_TEST (test_llist_backspace){
+	char *str = "hello";
+	int ret;
+
+	ret = insert(buf, str, 0);
+	fail_if( ret, "insert returned non-0" );
+
+	backspace(buf);
+	fail_if( strcmp(buf->cursor.line->contents, "hell"), "backspace failed" );
+
+	buf->cursor.offset=0;
+	backspace(buf);
+	fail_if( strcmp(buf->cursor.line->contents, "hell"), "backspacing at start of line shouldnt' make changes" );
 }
 END_TEST
 
@@ -167,7 +183,6 @@ llist_suite(void){
 	TCase *tc_llist = tcase_create("newline");
 	tcase_add_checked_fixture(tc_llist, llist_setup, llist_teardown);
 
-/*
 	tcase_add_test(tc_llist, test_llist_newline);
 	tcase_add_test(tc_llist, test_llist_insert);
 	tcase_add_test(tc_llist, test_llist_insert_realloc);
@@ -175,8 +190,9 @@ llist_suite(void){
 	tcase_add_test(tc_llist, test_llist_movement);
 	tcase_add_test(tc_llist, test_llist_load);
 	tcase_add_test(tc_llist, test_llist_save);
-*/
 	tcase_add_test(tc_llist, test_llist_insert_within_line);
+	tcase_add_test(tc_llist, test_llist_backspace);
+
 	suite_add_tcase(s, tc_llist);
 
 	return s;

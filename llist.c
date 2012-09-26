@@ -93,6 +93,18 @@ m_nextword(Buffer *buf){
 }
 
 /** llist functions **/
+void
+backspace(Buffer *buf){
+	if( buf->cursor.offset < 1 ){
+		/* FIXME TODO deal with case of backspacing over lines */
+		return;
+	}
+	int len = buf->cursor.line->len - buf->cursor.offset + 1;
+	memmove( &buf->cursor.line->contents[buf->cursor.offset-1], &buf->cursor.line->contents[buf->cursor.offset], len);
+	--buf->cursor.line->len;
+	--buf->cursor.offset;
+}
+
 int /* load file buf->path into buf, returns 0 on success and 1 on error */
 load(Buffer *buf){
 	int read; /* returned by fread */

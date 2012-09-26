@@ -1,13 +1,21 @@
 #include <stdlib.h>
 #include "ark.h"
+#include "ui.h"
+#include "llist.h"
 
 /* buffer shared with ui, owned by ark */
 static Buffer *buf;
 
 /* declaration of bindable functions */
 void
-f_quit(){
+f_quit(const Arg *arg){
 	ui_stop();
+}
+
+void
+f_cur(const Arg *arg){
+	if( arg->m )
+		(arg->m)(buf);
 }
 
 /* internal functions */

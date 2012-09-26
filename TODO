@@ -1,9 +1,9 @@
 features:
 	ui cursor
-	ui cursor movement
 	ui mouse cursor placement
 	ui mouse select
 
 technical debt:
+	you can insert text after a \n
 
 consider:

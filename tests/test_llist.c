@@ -87,13 +87,20 @@ START_TEST (test_llist_movement){
 	/* character is where to insert next, so end of line is after the last char and before the \0 */
 	fail_unless( buf->cursor.offset == strlen(buf->start->contents)+1, "endofline did not move to end of line" );
 
-	m_startoffile(buf);
-	//insert(p, "\n\n");
+	m_endoffile(buf);
+	fail_unless( buf->cursor.line == buf->end, "end of file is not buf->end");
+
 	m_startoffile(buf);
 	fail_unless( buf->cursor.line == buf->start, "start of file is not buf->start");
 
-	m_endoffile(buf);
-	fail_unless( buf->cursor.line == buf->end, "end of file is not buf->end");
+	insert(buf, "hello", 0);
+	m_startoffile(buf);
+
+	m_nextchar(buf);
+	fail_unless( buf->cursor.offset == 1, "nextchar didnt move cursor" );
+
+	m_prevchar(buf);
+	fail_unless( buf->cursor.offset == 0, "prevchar didnt move cursor" );
 }
 END_TEST
 

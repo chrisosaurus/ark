@@ -1,5 +1,6 @@
 #include <stdlib.h> /* calloc, free */
 #include "ui.h"
+#include "ark.h"
 #include "config.h"
 
 /* macros */

@@ -66,20 +66,40 @@ m_endoffile(Buffer *buf){
 
 void
 m_prevchar(Buffer *buf){
+	if( --buf->cursor.offset < 0 ){
+		if( buf->cursor.line->prev ){
+			buf->cursor.line = buf->cursor.line->prev;
+			buf->cursor.offset = buf->cursor.line->len;
+		} else {
+			buf->cursor.offset = 0;
+		}
+	}
 }
 
 void
 m_nextchar(Buffer *buf){
+	if( ++buf->cursor.offset > buf->cursor.line->len ){
+		if( buf->cursor.line->next ){
+			buf->cursor.line = buf->cursor.line->next;
+			buf->cursor.offset = 0;
+		} else {
+			buf->cursor.offset = buf->cursor.line->len;
+		}
+	}
 }
 
 void
 m_prevline(Buffer *buf){
+	if( ! buf->cursor.line->prev )
+		return;
 	buf->cursor.line = buf->cursor.line->prev;
 	buf->cursor.offset = 0;
 }
 
 void
 m_nextline(Buffer *buf){
+	if( ! buf->cursor.line->next )
+		return;
 	buf->cursor.line = buf->cursor.line->next;
 	buf->cursor.offset = 0;
 }

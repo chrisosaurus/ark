@@ -26,5 +26,9 @@ static const char *blahcmd[] = {"echo", "hello"};
 static Key keys[] = {
 	/* modifider	key	function	argument */
 	{ MODKEY,	XK_q,	f_quit,		{ .i=0 } },
-	{ MODKEY,	XK_b,	0,		{ .v=blahcmd } }
+	{ MODKEY,	XK_b,	0,		{ .v=blahcmd } },
+	{ 0,		XK_Left, f_cur, { .m=m_prevchar } },
+	{ 0,		XK_Right, f_cur, { .m=m_nextchar } },
+	{ 0,		XK_Up, f_cur, { .m=m_prevline } },
+	{ 0,		XK_Down, f_cur, { .m=m_nextline } }
 };

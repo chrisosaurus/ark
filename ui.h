@@ -7,13 +7,13 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h> /* XK_* */
 
-#include "ark.h"
 #include "llist.h"
 
 typedef union Arg Arg;
 union Arg{
 	int i;
 	void *v;
+	void (*m)(Buffer*);
 };
 
 typedef struct Key Key;

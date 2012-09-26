@@ -8,6 +8,7 @@
 #include <X11/keysym.h> /* XK_* */
 
 #include "ark.h"
+#include "llist.h"
 
 typedef union Arg Arg;
 union Arg{
@@ -27,7 +28,7 @@ struct Key{ /* structure used in config.h to bind a function to a key */
 void ui_stop();
 
 /* initialise */
-void ui_setup();
+void ui_setup(Buffer *buffer);
 
 /* tidyup */
 void ui_teardown();

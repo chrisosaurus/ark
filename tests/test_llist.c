@@ -60,6 +60,23 @@ START_TEST (test_llist_insert_newline){
 }
 END_TEST
 
+START_TEST (test_llist_insert_within_line){
+	/* test inserting a line within another */
+	char *str = "hello";
+	int ret;
+
+	ret = insert(buf, str);
+	fail_if( ret, "insert 1 returned non-0" );
+
+	buf->cursor = (Pos){buf->start, 0};
+	ret = insert(buf, "before\nafter");
+	fail_if( ret, "insert 2 returned non-0" );
+
+	fail_if( strcmp(buf->start->contents, "before\n"), "contents did not match expected" );
+	fail_if( strcmp(buf->start->next->contents, "afterhello"), "next->contents did not match expected" );
+}
+END_TEST
+
 START_TEST (test_llist_movement){
 	m_startofline(buf);
 	fail_unless( buf->cursor.line == buf->start, "startofline moved off line" );
@@ -147,18 +164,20 @@ llist_suite(void){
 	Suite *s = suite_create("llist");
 
 	/* individual test case */
-	TCase *tc_newline = tcase_create("newline");
-	tcase_add_checked_fixture(tc_newline, llist_setup, llist_teardown);
+	TCase *tc_llist = tcase_create("newline");
+	tcase_add_checked_fixture(tc_llist, llist_setup, llist_teardown);
 
-	tcase_add_test(tc_newline, test_llist_newline);
-	tcase_add_test(tc_newline, test_llist_insert);
-	tcase_add_test(tc_newline, test_llist_insert_realloc);
-	tcase_add_test(tc_newline, test_llist_insert_newline);
-	tcase_add_test(tc_newline, test_llist_movement);
-	tcase_add_test(tc_newline, test_llist_load);
-	tcase_add_test(tc_newline, test_llist_save);
-
-	suite_add_tcase(s, tc_newline);
+/*
+	tcase_add_test(tc_llist, test_llist_newline);
+	tcase_add_test(tc_llist, test_llist_insert);
+	tcase_add_test(tc_llist, test_llist_insert_realloc);
+	tcase_add_test(tc_llist, test_llist_insert_newline);
+	tcase_add_test(tc_llist, test_llist_movement);
+	tcase_add_test(tc_llist, test_llist_load);
+	tcase_add_test(tc_llist, test_llist_save);
+*/
+	tcase_add_test(tc_llist, test_llist_insert_within_line);
+	suite_add_tcase(s, tc_llist);
 
 	return s;
 }

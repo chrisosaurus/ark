@@ -144,7 +144,9 @@ insert(Buffer *buf, const char *str){
 	/* inserts character by character, performs far too many memmoves but is simple */
 
 	int i=0, l=strlen(str);
-	int ret;
+	int ret; /* return value from insert */
+	int oo; /* old offset */
+	Line *ol, *nl; /* old line, new line */
 
 	for( i=0; i<l; ++i ){
 		/* handle resizing */
@@ -165,7 +167,7 @@ insert(Buffer *buf, const char *str){
 
 		/* handle \n in str */
 		if( str[i] == '\n' ){
-			Line *nl = newline(1, buf->cursor.line, buf->cursor.line->next);
+			nl = newline(1, buf->cursor.line, buf->cursor.line->next);
 			if( ! nl ){
 				perror("Failed call to newline from llist:insert");
 				return 1; /* FIXME error */
@@ -174,14 +176,21 @@ insert(Buffer *buf, const char *str){
 				buf->cursor.line->next->prev = nl;
 			buf->cursor.line->next = nl;
 
+			/* old line */
+			ol = buf->cursor.line;
+			/* old offset */
+			oo = buf->cursor.offset;
+
 			/* move cursor to start of next line */
 			buf->cursor = (Pos){nl, 0};
 			/* copy over old contents */
-			ret = insert( buf, &buf->cursor.line->contents[buf->cursor.offset] );
+ /* FIXME TODO this will insert the \n which will cause a trailing newline to be inserted, silly */
+			ret = insert( buf, &ol->contents[oo] );
 			if( ret )
 				return 1;
 			/* add a null character */
-			buf->cursor.line->contents[buf->cursor.offset] = 0;
+			ol->contents[oo] = 0;
+			ol->len = oo;
 			/* carry on from the start of the next line */
 			buf->cursor = (Pos){nl, 0};
 		}

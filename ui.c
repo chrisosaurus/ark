@@ -145,7 +145,7 @@ keypress(XEvent *e){
 		char str[2] = {keysym, 0};
 		if( keysym == XK_Return )
 			str[0] = '\n';
-		insert(buf, str);
+		insert(buf, str, 0);
 		draw();
 		display();
 	//}

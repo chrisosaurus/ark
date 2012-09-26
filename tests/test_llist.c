@@ -20,7 +20,7 @@ START_TEST (test_llist_insert){
 	char *str = "hello world";
 	int ret;
 
-	ret = insert(buf, str);
+	ret = insert(buf, str, 0);
 	fail_if( ret, "insert returned non-0" );
 	/* len should be the same as strlen, neither takes \0 into account */
 	fail_unless( buf->cursor.line->len == strlen(str), "length after insert is incorrect (strlen of str)" );
@@ -37,7 +37,7 @@ START_TEST (test_llist_insert_realloc){
 
 	/* keep inserting until we realloc */
 	for( i=0; buf->start->mul<2; ++i ){
-		ret = insert(buf, str);
+		ret = insert(buf, str, 0);
 		fail_if( ret, "insert returned non-0");
 	}
 	fail_unless( strlen(buf->cursor.line->contents) == i*strlen(str), "multiple inserts failed" );
@@ -49,7 +49,7 @@ START_TEST (test_llist_insert_newline){
 	char *str="hello\nworld";
 	int ret;
 
-	ret = insert(buf, str);
+	ret = insert(buf, str, 0);
 	fail_if( ret, "insert returned non-0 error code in test_llist_insert_newline" );
 
 	/* '\n'(s) should appear in the text */
@@ -65,11 +65,11 @@ START_TEST (test_llist_insert_within_line){
 	char *str = "hello";
 	int ret;
 
-	ret = insert(buf, str);
+	ret = insert(buf, str, 0);
 	fail_if( ret, "insert 1 returned non-0" );
 
 	buf->cursor = (Pos){buf->start, 0};
-	ret = insert(buf, "before\nafter");
+	ret = insert(buf, "before\nafter", 0);
 	fail_if( ret, "insert 2 returned non-0" );
 
 	fail_if( strcmp(buf->start->contents, "before\n"), "contents did not match expected" );
@@ -119,8 +119,8 @@ START_TEST (test_llist_save){
 	char *str = "hello\nthere \n\nworld";
 	int ret;
 
-	ret = insert( buf, str );
-	fail_if( ret, "insert returned non-0 in test_llist_save" );
+	ret = insert( buf, str, 0 );
+	fail_if( ret, "insert returned non-0 in test_llist_save", 0);
 	save(buf);
 
 	FILE *f = fopen(path, "r");

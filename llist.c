@@ -115,7 +115,7 @@ load(Buffer *buf){
 		if( read == EOF )
 			break;
 		tmp[read] = '\0';
-		ret = insert( buf, tmp );
+		ret = insert( buf, tmp, 0);
 		if( ret )
 			return ret;
 	}
@@ -140,7 +140,7 @@ save(Buffer *buf){
 }
 
 int /* insert at cursor and move cursor along, returns 0 on success and 1 on error */
-insert(Buffer *buf, const char *str){
+insert(Buffer *buf, const char *str, int recursive){
 	/* inserts character by character, performs far too many memmoves but is simple */
 
 	int i=0, l=strlen(str);
@@ -166,7 +166,7 @@ insert(Buffer *buf, const char *str){
 		++buf->cursor.offset;
 
 		/* handle \n in str */
-		if( str[i] == '\n' ){
+		if( !recursive && str[i] == '\n' ){
 			nl = newline(1, buf->cursor.line, buf->cursor.line->next);
 			if( ! nl ){
 				perror("Failed call to newline from llist:insert");
@@ -185,7 +185,7 @@ insert(Buffer *buf, const char *str){
 			buf->cursor = (Pos){nl, 0};
 			/* copy over old contents */
  /* FIXME TODO this will insert the \n which will cause a trailing newline to be inserted, silly */
-			ret = insert( buf, &ol->contents[oo] );
+			ret = insert( buf, &ol->contents[oo], 1);
 			if( ret )
 				return 1;
 			/* add a null character */

@@ -49,7 +49,8 @@ int load(Buffer *buf);
 /* save buf into file buf->path, returns 0 on success and 1 on error */
 int save(Buffer *buf);
 /* insert at cursor and move cursor along, returns 0 on success and 1 on error */
-int insert(Buffer *buf, const char *str);
+/* recursive specified the behavior of \n */
+int insert(Buffer *buf, const char *str, int recursive);
 
 /** structure management **/
 Line* newline(int mul, Line *prev, Line *next);

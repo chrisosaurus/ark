@@ -1,11 +1,11 @@
 features:
-	ui keypress -> llist insert
+	ui cursor
+	ui cursor movement
 	ui mouse cursor placement
 	ui mouse select
 	llist delete
 
 technical debt:
 	handling drawing of newline and tabs
-	insert calls insert recursively, if the old line has a \n at the end then this will cause an additional line to be created
 
 consider:

@@ -4,6 +4,7 @@ features:
 	ui mouse select
 
 technical debt:
-	you can insert text after a \n
+	behavior/display of tabs (insert a character between/before them, have a tab within a line, shouldnt actually be 4 spaces but 4%n)
 
 consider:
+

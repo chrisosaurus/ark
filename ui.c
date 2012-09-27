@@ -26,6 +26,7 @@ static void /* draw the llist to the pixmap */
 draw(){
 	int x=5, y=15; /* start position for x and y */
 	Line *l;
+	int i=0;
 
 	/* get text information */
 	XFontStruct *xfs = XQueryFont(dpy, XGContextFromGC(pixgc));
@@ -43,12 +44,13 @@ draw(){
 	XFillRectangle(dpy, pixmap, pixgc, 0, 0, wa.width, wa.height);
 	XSetForeground(dpy, pixgc, black_color);
 
-	/* if the line just drawn had a \n, we shouldn't draw this */
-	int newline;
 	/* local x used within the drawing loop */
 	int localx;
 	/* indent within line */
 	int indent;
+
+	/* draw the cursor */
+	//XDrawLine( dpy, pixmap, pixgc, xf, yf, xt, yt );
 
 	/* draw all the things */
 	for( l=buf->start; l; l=l->next ){
@@ -59,40 +61,29 @@ draw(){
 		* 		draw line
 		* 		y += TextHeight( &pos.line[pos.offset] )
 		* 		pos.line = pos.line.next
-	 	* 		pos.offset = 0
-	 	* 	else
-	 	* 		find highest offset that will fit within width
+		* 		pos.offset = 0
+		* 	else
+		* 		find highest offset that will fit within width
 		* 		draw [pos - offset]
 		* 		y += TextHeight( [pos - offset] ) + descent + ascent
 		* 		pos = line, offset
 		* 		record vlines, vwidth
-	 	*/
+		*/
 		if( ! (y+hoffset < height) )
 			break;
 
-		/* if we have a newline, don't draw it */
-		newline = (l->contents[l->len-1] == '\n');
 		woffset = XTextWidth( xfs, l->contents, l->len );
-		//if( x + woffset < width ){
-			localx = x;
-			indent = 0;
-			for( indent=0; l->contents[indent] == '\t'; ++indent ){
-				/* FIXME make TABWIDTH configurable */
-				XDrawString( dpy, pixmap, pixgc, localx, y, tabdisplay, tabwidth);
-				/* FIXME make this static */
-				localx += XTextWidth( xfs, tabdisplay, tabwidth);
-			}
-			/* draw line */
-			XDrawString( dpy, pixmap, pixgc, localx, y, &l->contents[indent], l->len - newline - indent );
-			y += hoffset;
-		//} else {
-			/* find smallest subset that will fit
-			*  draw subset, either wrap or ignore latter part */
-
-			/* FIXME assume that l is our smallest subset */
-		//	XDrawString( dpy, pixmap, pixgc, x, y, l->contents, l->len - newline );
-		//	y += hoffset;
-		//}
+		localx = x;
+		indent = 0;
+		for( indent=0; l->contents[indent] == '\t'; ++indent ){
+			/* FIXME make TABWIDTH configurable */
+			XDrawString( dpy, pixmap, pixgc, localx, y, tabdisplay, tabwidth);
+			/* FIXME make this static */
+			localx += XTextWidth( xfs, tabdisplay, tabwidth);
+		}
+		/* draw line */
+		XDrawString( dpy, pixmap, pixgc, localx, y, &l->contents[indent], l->len - indent );
+		y += hoffset;
 	}
 
 	/* x=startx, y=starty
@@ -172,7 +163,7 @@ keypress(XEvent *e){
 		/* see /usr/include/X11/keysymdef.h */
 
 		char *str = keysym_to_charp(keysym);
-		insert(buf, str, 0);
+		insert(buf, str);
 		free(str);
 		draw();
 		display();

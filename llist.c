@@ -147,7 +147,7 @@ load(Buffer *buf){
 		if( read == EOF )
 			break;
 		tmp[read] = '\0';
-		ret = insert( buf, tmp, 0);
+		ret = insert( buf, tmp);
 		if( ret )
 			return ret;
 	}
@@ -166,13 +166,14 @@ save(Buffer *buf){
 	}
 	for( l=buf->start ; l; l=l->next ){
 		fwrite(l->contents, sizeof(char), l->len, f);
+		fwrite("\n", sizeof(char), 1, f);
 	}
 	fclose(f);
 	return 0;
 }
 
 int /* insert at cursor and move cursor along, returns 0 on success and 1 on error */
-insert(Buffer *buf, const char *str, int recursive){
+insert(Buffer *buf, const char *str){
 	/* inserts character by character, performs far too many memmoves but is simple */
 
 	int i=0, l=strlen(str);
@@ -189,16 +190,8 @@ insert(Buffer *buf, const char *str, int recursive){
 				return 1; /* FIXME error */
 			}
 		}
-
-		/* move old contents out of the way and insert character */
-		memmove( &buf->cursor.line->contents[buf->cursor.offset+1], & buf->cursor.line->contents[buf->cursor.offset], buf->cursor.line->len - buf->cursor.offset + 1 );
-
-		buf->cursor.line->contents[buf->cursor.offset] = str[i];
-		++buf->cursor.line->len;
-		++buf->cursor.offset;
-
-		/* handle \n in str */
-		if( !recursive && str[i] == '\n' ){
+		/* handle newline in string, should not be inserted */
+		if( str[i] == '\n' || str[i] == '\r' ){
 			nl = newline(1, buf->cursor.line, buf->cursor.line->next);
 			if( ! nl ){
 				perror("Failed call to newline from llist:insert");
@@ -217,7 +210,7 @@ insert(Buffer *buf, const char *str, int recursive){
 			buf->cursor = (Pos){nl, 0};
 			/* copy over old contents */
  /* FIXME TODO this will insert the \n which will cause a trailing newline to be inserted, silly */
-			ret = insert( buf, &ol->contents[oo], 1);
+			ret = insert( buf, &ol->contents[oo]);
 			if( ret )
 				return 1;
 			/* add a null character */
@@ -225,6 +218,14 @@ insert(Buffer *buf, const char *str, int recursive){
 			ol->len = oo;
 			/* carry on from the start of the next line */
 			buf->cursor = (Pos){nl, 0};
+		} else {
+
+			/* move old contents out of the way and insert character */
+			memmove( &buf->cursor.line->contents[buf->cursor.offset+1], & buf->cursor.line->contents[buf->cursor.offset], buf->cursor.line->len - buf->cursor.offset + 1 );
+
+			buf->cursor.line->contents[buf->cursor.offset] = str[i];
+			++buf->cursor.line->len;
+			++buf->cursor.offset;
 		}
 	}
 	return 0;

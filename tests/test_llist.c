@@ -20,7 +20,7 @@ START_TEST (test_llist_insert){
 	char *str = "hello world";
 	int ret;
 
-	ret = insert(buf, str, 0);
+	ret = insert(buf, str);
 	fail_if( ret, "insert returned non-0" );
 	/* len should be the same as strlen, neither takes \0 into account */
 	fail_unless( buf->cursor.line->len == strlen(str), "length after insert is incorrect (strlen of str)" );
@@ -37,7 +37,7 @@ START_TEST (test_llist_insert_realloc){
 
 	/* keep inserting until we realloc */
 	for( i=0; buf->start->mul<2; ++i ){
-		ret = insert(buf, str, 0);
+		ret = insert(buf, str);
 		fail_if( ret, "insert returned non-0");
 	}
 	fail_unless( strlen(buf->cursor.line->contents) == i*strlen(str), "multiple inserts failed" );
@@ -49,11 +49,11 @@ START_TEST (test_llist_insert_newline){
 	char *str="hello\nworld";
 	int ret;
 
-	ret = insert(buf, str, 0);
+	ret = insert(buf, str);
 	fail_if( ret, "insert returned non-0 error code in test_llist_insert_newline" );
 
-	/* '\n'(s) should appear in the text */
-	fail_unless( strlen(buf->start->contents) == strlen("hello\n"), "inserting hello\\n failed" );
+	/* '\n'(s) should NOT appear in the text */
+	fail_unless( strlen(buf->start->contents) == strlen("hello"), "inserting hello\\n failed" );
 	fail_unless( buf->start->next != 0, "inserting \\n failed to create a newline" );
 	fail_unless( strlen(buf->start->next->contents) == strlen("world"), "newline doesnt match expected text ('world')" );
 	fail_unless( buf->start->next->prev == buf->start, "newline prev doesnt match line" );
@@ -65,14 +65,14 @@ START_TEST (test_llist_insert_within_line){
 	char *str = "hello";
 	int ret;
 
-	ret = insert(buf, str, 0);
+	ret = insert(buf, str);
 	fail_if( ret, "insert 1 returned non-0" );
 
 	buf->cursor = (Pos){buf->start, 0};
-	ret = insert(buf, "before\nafter", 0);
+	ret = insert(buf, "before\nafter");
 	fail_if( ret, "insert 2 returned non-0" );
 
-	fail_if( strcmp(buf->start->contents, "before\n"), "contents did not match expected" );
+	fail_if( strcmp(buf->start->contents, "before"), "contents did not match expected" );
 	fail_if( strcmp(buf->start->next->contents, "afterhello"), "next->contents did not match expected" );
 }
 END_TEST
@@ -93,7 +93,7 @@ START_TEST (test_llist_movement){
 	m_startoffile(buf);
 	fail_unless( buf->cursor.line == buf->start, "start of file is not buf->start");
 
-	insert(buf, "hello", 0);
+	insert(buf, "hello");
 	m_startoffile(buf);
 
 	m_nextchar(buf);
@@ -114,9 +114,9 @@ START_TEST (test_llist_load){
 	Buffer *buf = newbuffer(path);
 	load(buf);
 
-	fail_if( strcmp(buf->start->contents, "hello\n"), "line contents did not match expected ('hello\\n')" );
-	fail_if( strcmp(buf->start->next->contents, "there \n"), "line->next contents did not match expected ('there \\n')" );
-	fail_if( strcmp(buf->start->next->next->contents, "\n"), "line->next->next contents did not match expected ('\\n')" );
+	fail_if( strcmp(buf->start->contents, "hello"), "line contents did not match expected ('hello')" );
+	fail_if( strcmp(buf->start->next->contents, "there "), "line->next contents did not match expected ('there')" );
+	fail_if( strcmp(buf->start->next->next->contents, ""), "line->next->next contents did not match expected ('')" );
 	fail_if( strcmp(buf->start->next->next->next->contents, "world"), "l->n->n->n->c did not match expected ('world')" );
 	fail_if( buf->start->next->next->next->next != 0, "more lines in llist than expected" );
 }
@@ -126,7 +126,7 @@ START_TEST (test_llist_save){
 	char *str = "hello\nthere \n\nworld";
 	int ret;
 
-	ret = insert( buf, str, 0 );
+	ret = insert(buf, str);
 	fail_if( ret, "insert returned non-0 in test_llist_save");
 	save(buf);
 
@@ -142,7 +142,7 @@ START_TEST (test_llist_backspace){
 	char *str = "hello";
 	int ret;
 
-	ret = insert(buf, str, 0);
+	ret = insert(buf, str);
 	fail_if( ret, "insert returned non-0" );
 
 	backspace(buf);

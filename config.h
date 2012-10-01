@@ -7,8 +7,8 @@ static const char normfbcolor[] = "#eeeeee";
 
 /* number of spaces used to display a tab */
 static const int tabwidth = 4;
-/* string used to display tab, tabwidth chars of tabdisplay are printed for each tab */
-static const char tabdisplay[] = "    ";
+/* string holding the char to insert for each sapce within tabwidht */
+static const char tabchar[] = " ";
 
 /* commands you can bind to Arg.v
  * these are passed to execvp so they should be formatted similar to

@@ -1,10 +1,9 @@
 features:
-	ui cursor
 	ui mouse cursor placement
 	ui mouse select
 
 technical debt:
-	behavior/display of tabs (insert a character between/before them, have a tab within a line, shouldnt actually be 4 spaces but 4%n)
+	drawing loop, char by char
 
 consider:
 

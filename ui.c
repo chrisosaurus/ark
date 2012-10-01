@@ -26,7 +26,8 @@ static void /* draw the llist to the pixmap */
 draw(){
 	int x=5, y=15; /* start position for x and y */
 	Line *l;
-	int i=0;
+	int i=0, vi=0, lc=0; /* index into l->contents, visual index, line count */
+	int cpy=0, cpx=0; /* cursor pos y, cursor pos x */
 
 	/* get text information */
 	XFontStruct *xfs = XQueryFont(dpy, XGContextFromGC(pixgc));
@@ -37,7 +38,7 @@ draw(){
 	/* calculate offsets */
 	int spacing = 0; /* custom offset */
 	int hoffset = fdr + far + spacing; /* height offset, ascent + descent + spacing */
-	int woffset = 0;
+	int woffset = XTextWidth( xfs, "Z", 1 );
 
 	/* clear our pixmap */
 	XSetForeground(dpy, pixgc, white_color);
@@ -46,14 +47,10 @@ draw(){
 
 	/* local x used within the drawing loop */
 	int localx;
-	/* indent within line */
-	int indent;
 
-	/* draw the cursor */
-	//XDrawLine( dpy, pixmap, pixgc, xf, yf, xt, yt );
 
 	/* draw all the things */
-	for( l=buf->start; l; l=l->next ){
+	for( l=buf->start, lc=0; l; l=l->next, ++lc ){
 		/*
 		* 	if not y + TextHeight( &pos.line[pos.offset] ) < height
 		* 		break
@@ -69,22 +66,39 @@ draw(){
 		* 		pos = line, offset
 		* 		record vlines, vwidth
 		*/
+
+		/* stop if drawing another line would go off the window */
 		if( ! (y+hoffset < height) )
 			break;
 
-		woffset = XTextWidth( xfs, l->contents, l->len );
 		localx = x;
-		indent = 0;
-		for( indent=0; l->contents[indent] == '\t'; ++indent ){
-			/* FIXME make TABWIDTH configurable */
-			XDrawString( dpy, pixmap, pixgc, localx, y, tabdisplay, tabwidth);
-			/* FIXME make this static */
-			localx += XTextWidth( xfs, tabdisplay, tabwidth);
+
+		/* we go around for i = l->len as this is a valid position for the cursor and special cases are bad */
+		for( i=0, vi=0; i <= l->len; ++i ){
+			if( i == buf->cursor.offset && l == buf->cursor.line ){
+				cpx = localx;
+				cpy = y-far;
+			}
+
+			if( l->contents[i] == '\t' ){
+				do {
+					XDrawString( dpy, pixmap, pixgc, localx, y, tabchar, 1 );
+					localx += woffset;
+				} while( ++vi % tabwidth );
+				continue;
+			} else if( l->contents[i] != '\0' ){
+				XDrawString( dpy, pixmap, pixgc, localx, y, &l->contents[i], 1 );
+			}
+
+			localx += woffset;
+			++vi;
 		}
-		/* draw line */
-		XDrawString( dpy, pixmap, pixgc, localx, y, &l->contents[indent], l->len - indent );
+
 		y += hoffset;
 	}
+
+	/* draw the cursor */
+	XDrawLine( dpy, pixmap, pixgc, cpx, cpy, cpx, cpy+ hoffset );
 
 	/* x=startx, y=starty
 	 * pos = {line, 0}
@@ -149,6 +163,8 @@ keypress(XEvent *e){
 	for( i=0; i < LENGTH(keys); ++i){
 		if( keysym == keys[i].keysym && keyevent.state == keys[i].mods && keys[i].f_func ){
 			keys[i].f_func( &(keys[i].arg) );
+			draw();
+			display();
 			return;
 		}
 	}

@@ -138,6 +138,9 @@ keysym_to_charp(KeySym keysym){
 		case XK_Return:
 			cp[0] = '\n';
 			break;
+		case XK_Tab:
+			cp[0] = '\t';
+			break;
 		case XK_BackSpace:
 			backspace(buf);
 			break;

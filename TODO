@@ -1,5 +1,6 @@
 features:
 	ui mouse cursor placement
+	ui scrolling
 	ui mouse select
 
 technical debt:

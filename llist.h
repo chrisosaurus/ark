@@ -27,6 +27,7 @@ struct Pos{
 typedef struct Buffer Buffer;
 struct Buffer{
 	Line *start, *end; /* first and last line */
+	Line *sstart,*send; /* first and last lines on screen */
 	Pos cursor; /* current cursor position within buffer */
 	char *path; /* relative path to file or 0 */
 };
@@ -52,6 +53,8 @@ int save(Buffer *buf);
 /* recursive specified the behavior of \n */
 int insert(Buffer *buf, const char *str);
 void backspace(Buffer *buf);
+/* select linenum,offset from within screen */
+void select(Buffer *buf, int linenum, int offset);
 
 /** structure management **/
 Line* newline(int mul, Line *prev, Line *next);

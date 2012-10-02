@@ -15,6 +15,9 @@ static Pixmap pixmap;
 static GC wingc, pixgc;
 static int width=400, height=400; /* default dimensions */
 static int black_color, white_color;
+static char *title; /* allocated in setup */
+static int startx=5, starty=15; /* starting x and y positions */
+static int hoffset=0, woffset=0, fascent=0, fdescent=0;/* height and width offset for font, font ascent and descent */
 
 /* set by ui_setup and ui_stop, if 0 then ui_mainloop will return */
 static int running = 0;
@@ -22,24 +25,14 @@ static int running = 0;
 /* buffer, shared with ark */
 static Buffer *buf;
 
+
 /* internal functions */
 static void /* draw the llist to the pixmap */
 draw(){
-	int x=5, y=15; /* start position for x and y */
+	int x=startx, y=starty;
 	Line *l;
 	int i=0, vi=0, lc=0; /* index into l->contents, visual index, line count */
 	int cpy=0, cpx=0; /* cursor pos y, cursor pos x */
-
-	/* get text information */
-	XFontStruct *xfs = XQueryFont(dpy, XGContextFromGC(pixgc));
-	XCharStruct ch; /* FIXME TODO wtf is this used for? XFontStruct contains these, which char is this for? etc? */
-	int dir, far, fdr; /* direction return, font ascent return, font descent return */
-	/* this assumes that our strings are all similar, could do per string */
-	XTextExtents( xfs, "aAzZ1", 5, &dir, &far, &fdr, &ch);
-	/* calculate offsets */
-	int spacing = 0; /* custom offset */
-	int hoffset = fdr + far + spacing; /* height offset, ascent + descent + spacing */
-	int woffset = XTextWidth( xfs, "Z", 1 );
 
 	/* clear our pixmap */
 	XSetForeground(dpy, pixgc, white_color);
@@ -78,7 +71,7 @@ draw(){
 		for( i=0, vi=0; i <= l->len; ++i ){
 			if( i == buf->cursor.offset && l == buf->cursor.line ){
 				cpx = localx;
-				cpy = y-far;
+				cpy = y-fascent;
 			}
 
 			if( l->contents[i] == '\t' ){
@@ -194,6 +187,20 @@ keypress(XEvent *e){
 	}
 }
 
+static void /* converts an x,y pair to a cursor position */
+buttonpress(XEvent *e){
+	int x=e->xbutton.x, y=e->xbutton.y;
+	x -= startx;
+	y -= starty - fascent;
+	int linenum = y / hoffset;
+	int offset = x / woffset;
+
+	/* FIXME need to deal with tabs and vi... */
+	select(buf, linenum, offset);
+	draw();
+	display();
+}
+
 static void
 configure(XEvent *e){
 	/* we could get the width and height from e.configure, but we need the depth from the window anyway */
@@ -218,6 +225,7 @@ configure(XEvent *e){
 /* array of handlers indexed by XEvent.type */
 static void (* handler[LASTEvent]) (XEvent *) = {
 	[KeyPress] = keypress,
+	[ButtonPress] = buttonpress,
 	[ConfigureNotify] = configure
 };
 
@@ -258,10 +266,10 @@ ui_setup(Buffer *buffer){
 				| EnterWindowMask /* EnterNotify */
 				| FocusChangeMask /* FocusIn */
 				| KeymapStateMask /* KeymapNotify (follows EnterNotify and FocusIn events) */
+				| ButtonPressMask /* ButtonPress */
 		);
 
 	/* set the title */
-	char *title;
 	if( buf->path ){
 		/* \0 + strlen("ark ") + strlen(buf->path) */
 		int len = 1 + 4 + strlen(buf->path);
@@ -270,6 +278,17 @@ ui_setup(Buffer *buffer){
 	} else
 		title = "ark";
 	XStoreName(dpy, window, title);
+
+	/* get font information */
+	/* get text information */
+	XFontStruct *xfs = XQueryFont(dpy, XGContextFromGC(pixgc));
+	XCharStruct ch; /* FIXME TODO wtf is this used for? XFontStruct contains these, which char is this for? etc? */
+	int dir; /* direction return */
+	/* this assumes that our strings are all similar, could do per string */
+	XTextExtents( xfs, "aAzZ1", 5, &dir, &fascent, &fdescent, &ch);
+	/* calculate offsets */
+	hoffset = fdescent + fascent; /* height offset, ascent + descent */
+	woffset = XTextWidth( xfs, "Z", 1 );
 
 	/* map the window */
 	XMapWindow(dpy, window);
@@ -281,6 +300,7 @@ ui_teardown(){
 	XFreeGC(dpy, wingc); /* may fail but do we care? */
 	XFreeGC(dpy, pixgc);
 	XCloseDisplay(dpy);
+	free(title);
 }
 
 void

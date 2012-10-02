@@ -33,8 +33,8 @@ newbuffer(char *path){
 		perror("Failed to ammloc in llist:newfile for ");
 		return 0; /* error */
 	}
-	b->start = 0;
-	b->end = 0;
+	b->sstart = b->start = 0;
+	b->send = b->end = 0;
 	b->path = path;
 	return b;
 }
@@ -114,6 +114,21 @@ m_nextword(Buffer *buf){
 
 /** llist functions **/
 void
+select(Buffer *buf, int linenum, int offset){
+	Line *l;
+	if( ! buf->sstart )
+		return;
+
+	for( l=buf->sstart; linenum && l; --linenum, l=l->next ) ;
+
+	if( !l )
+		return;
+
+	buf->cursor.line = l;
+	buf->cursor.offset = offset > l->len ? l->len : offset;
+}
+
+void
 backspace(Buffer *buf){
 	if( buf->cursor.offset < 1 ){
 		/* FIXME TODO deal with case of backspacing over lines */
@@ -138,8 +153,8 @@ load(Buffer *buf){
 	}
 
 	if( ! buf->start){
-		buf->start = newline(1, 0, 0);
-		buf->end = buf->start;
+		buf->sstart = buf->start = newline(1, 0, 0);
+		buf->send = buf->end = buf->start;
 		buf->cursor = (Pos){buf->start, 0};
 	}
 

@@ -2,6 +2,7 @@ features:
 	ui mouse cursor placement
 	ui scrolling
 	ui mouse select
+	complex cursor movement (proper moving down of lines, jump by word, etc. )
 
 technical debt:
 	drawing loop, char by char

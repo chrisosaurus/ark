@@ -1,4 +1,5 @@
-#include <stdlib.h> /* calloc, free */
+#include <stdlib.h> /* calloc, free, malloc */
+#include <string.h> /* strlen */
 #include "ui.h"
 #include "ark.h"
 #include "config.h"
@@ -97,8 +98,12 @@ draw(){
 		y += hoffset;
 	}
 
-	/* draw the cursor */
-	XDrawLine( dpy, pixmap, pixgc, cpx, cpy, cpx, cpy+ hoffset );
+	/* draw the cursor line, offset the x so we don't intersect any characters */
+	/* cpy and cpy+hoffset for unfilled-dumbells, cpy-1 and cpy+hoffset+1 for filled-dumbells */
+	XDrawLine( dpy, pixmap, pixgc, cpx-1, cpy-1, cpx-1, cpy+hoffset+1 );
+	/* draw the 'dumbells' */
+	XDrawRectangle( dpy, pixmap, pixgc, cpx-2, cpy-2, 2, 2 );
+	XDrawRectangle( dpy, pixmap, pixgc, cpx-2, cpy+hoffset, 2, 2 );
 
 	/* x=startx, y=starty
 	 * pos = {line, 0}
@@ -254,6 +259,17 @@ ui_setup(Buffer *buffer){
 				| FocusChangeMask /* FocusIn */
 				| KeymapStateMask /* KeymapNotify (follows EnterNotify and FocusIn events) */
 		);
+
+	/* set the title */
+	char *title;
+	if( buf->path ){
+		/* \0 + strlen("ark ") + strlen(buf->path) */
+		int len = 1 + 4 + strlen(buf->path);
+		title = malloc( len );
+		snprintf(title, len, "ark %s", buf->path);
+	} else
+		title = "ark";
+	XStoreName(dpy, window, title);
 
 	/* map the window */
 	XMapWindow(dpy, window);

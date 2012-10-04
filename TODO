@@ -6,6 +6,7 @@ features:
 
 technical debt:
 	drawing loop, char by char
+	offsets within line vs vertical offsets, causes issues with mouse cursor and keyboard movement
 
 consider:
 

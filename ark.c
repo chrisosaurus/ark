@@ -20,8 +20,8 @@ f_cur(const Arg *arg){
 
 /* internal functions */
 static void
-setup(){
-	buf = newbuffer("llist.c");
+setup(char *file){
+	buf = newbuffer(file);
 	load(buf);
 	m_startoffile(buf);
 }
@@ -34,7 +34,11 @@ teardown(){
 int /* handle args, setup and then being mainloop */
 main(int argc, char **argv){
 
-	setup();
+	if( argc <2 ){
+		puts("No file provided, usage: ark filename");
+		return 1;
+	}
+	setup(argv[1]);
 	ui_setup(buf);
 	ui_mainloop();
 	ui_teardown();

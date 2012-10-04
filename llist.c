@@ -2,6 +2,10 @@
 #include <stdlib.h> /* malloc, realloc */
 #include <string.h> /* strlen, memmove */
 
+#include "ark.h" /* ark.h needed by config.h */
+#include "ui.h" /* ui.h needed by config.h */
+#include "config.h"
+
 #include "llist.h"
 
 #define BUFSIZE 80
@@ -92,16 +96,20 @@ void
 m_prevline(Buffer *buf){
 	if( ! buf->cursor.line->prev )
 		return;
+	int vo = i_to_vo(buf->cursor.line, buf->cursor.offset);
 	buf->cursor.line = buf->cursor.line->prev;
-	buf->cursor.offset = 0;
+	int i = vo_to_i(buf->cursor.line, vo);
+	buf->cursor.offset = i;
 }
 
 void
 m_nextline(Buffer *buf){
 	if( ! buf->cursor.line->next )
 		return;
+	int vo = i_to_vo(buf->cursor.line, buf->cursor.offset);
 	buf->cursor.line = buf->cursor.line->next;
-	buf->cursor.offset = 0;
+	int i = vo_to_i(buf->cursor.line, vo);
+	buf->cursor.offset = i;
 }
 
 void
@@ -113,8 +121,45 @@ m_nextword(Buffer *buf){
 }
 
 /** llist functions **/
+int
+vo_to_i(Line *l, int voffset){
+	int i, vo;
+	if( !l )
+		return -1;
+
+	/* find appropriate i for voffset */
+	for( i=0, vo=0; vo < voffset; ++i ){
+		if( i >= l->len )
+			break; /* if we are off the end of the line, then return the end of the line */
+		if( l->contents[i] == '\t' )
+			vo += tabwidth;
+		else
+			++vo;
+	}
+	return i;
+}
+
+int
+i_to_vo(Line *l, int offset){
+	int vo;
+	if( !l )
+		return -1;
+
+	/* find highest offset within line */
+	for( ; offset >= l->len; --offset ) ;
+
+	/* find appropriate voffset for offset */
+	for( vo=-1; offset >= 0; --offset ){
+		if( l->contents[offset] == '\t' )
+			vo += tabwidth;
+		else
+			++vo;
+	}
+	return vo;
+}
+
 void
-select(Buffer *buf, int linenum, int offset){
+select(Buffer *buf, int linenum, int voffset){
 	Line *l;
 	if( ! buf->sstart )
 		return;
@@ -125,7 +170,7 @@ select(Buffer *buf, int linenum, int offset){
 		return;
 
 	buf->cursor.line = l;
-	buf->cursor.offset = offset > l->len ? l->len : offset;
+	buf->cursor.offset = vo_to_i(l, voffset);
 }
 
 void

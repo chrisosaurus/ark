@@ -55,6 +55,11 @@ int insert(Buffer *buf, const char *str);
 void backspace(Buffer *buf);
 /* select linenum,offset from within screen */
 void select(Buffer *buf, int linenum, int offset);
+/* functions for converting voffsets (visual offset on screen, number of spaces occupied)
+ * to ioffsers (offset into char array) (and back) using a line, int and TABWIDTH (from config.h)
+ */
+int vo_to_i(Line *l, int voffset);
+int i_to_vo(Line *l, int offset);
 
 /** structure management **/
 Line* newline(int mul, Line *prev, Line *next);

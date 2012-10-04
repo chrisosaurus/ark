@@ -12,10 +12,16 @@ f_quit(const Arg *arg){
 	ui_stop();
 }
 
-void
-f_cur(const Arg *arg){
-	if( arg->m )
-		(arg->m)(buf);
+void /* execute function in arg->f */
+f_func(const Arg *arg){
+	if( arg->f )
+		(arg->f)(buf);
+}
+
+void /* save */
+f_save(const Arg*arg){
+	/* FIXME need to deal with return code */
+	save(buf);
 }
 
 /* internal functions */

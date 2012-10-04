@@ -13,7 +13,7 @@ typedef union Arg Arg;
 union Arg{
 	int i;
 	void *v;
-	void (*m)(Buffer*);
+	void (*f)(Buffer*); /* function to execute */
 };
 
 typedef struct Key Key;

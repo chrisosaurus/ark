@@ -4,6 +4,7 @@ features:
 
 technical debt:
 	drawing loop, char by char
+	backspace across lines
 
 consider:
 	scrolling in buttonpress, could move elsewhere

@@ -287,3 +287,4 @@ insert(Buffer *buf, const char *str){
 	}
 	return 0;
 }
+

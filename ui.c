@@ -3,6 +3,7 @@
 #include "ui.h"
 #include "ark.h"
 #include "config.h"
+#include "bindings.h"
 
 /* macros */
 #define LENGTH(x) (sizeof x / sizeof x[0])

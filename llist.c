@@ -2,11 +2,8 @@
 #include <stdlib.h> /* malloc, realloc */
 #include <string.h> /* strlen, memmove */
 
-#include "ark.h" /* ark.h needed by config.h */
-#include "ui.h" /* ui.h needed by config.h */
-#include "config.h"
-
 #include "llist.h"
+#include "config.h"
 
 #define BUFSIZE 80
 

@@ -154,6 +154,24 @@ START_TEST (test_llist_backspace){
 }
 END_TEST
 
+START_TEST (test_llist_vo_i){
+	char *str = "\thello\n\t\tworld\n\tawesome\n";
+	int ret;
+
+	ret = insert(buf, str);
+	fail_if( ret, "insert returned non-0" );
+
+	buf->cursor.offset=0;
+	buf->cursor.line = buf->start;
+
+	int vo = i_to_vo( buf->cursor.line, 4 );
+	fail_unless( vo == 7, "i_to_vo didnt return correct value (7)" );
+
+	int i = vo_to_i( buf->cursor.line, vo);
+	fail_unless( i == 4, "vo_to_i didnt return correct value (4)" );
+};
+END_TEST
+
 void
 llist_setup(){
 	Line *line = newline(1, 0, 0);
@@ -199,6 +217,7 @@ llist_suite(void){
 	tcase_add_test(tc_llist, test_llist_save);
 	tcase_add_test(tc_llist, test_llist_insert_within_line);
 	tcase_add_test(tc_llist, test_llist_backspace);
+	tcase_add_test(tc_llist, test_llist_vo_i);
 
 	suite_add_tcase(s, tc_llist);
 

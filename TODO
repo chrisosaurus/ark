@@ -7,4 +7,3 @@ technical debt:
 	drawing loop, char by char
 
 consider:
-	behavior of position_cursor when moving through multiple tabs ('snaps' to chars)

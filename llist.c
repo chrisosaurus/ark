@@ -96,6 +96,7 @@ m_prevline(Buffer *buf){
 	int vo = i_to_vo(buf->cursor.line, buf->cursor.offset);
 	buf->cursor.line = buf->cursor.line->prev;
 	int i = vo_to_i(buf->cursor.line, vo);
+	printf("prevline vo (%d), i (%d)\n\n", vo, i);
 	buf->cursor.offset = i;
 }
 
@@ -106,6 +107,7 @@ m_nextline(Buffer *buf){
 	int vo = i_to_vo(buf->cursor.line, buf->cursor.offset);
 	buf->cursor.line = buf->cursor.line->next;
 	int i = vo_to_i(buf->cursor.line, vo);
+	printf("nextline vo (%d), i (%d)\n\n", vo, i);
 	buf->cursor.offset = i;
 }
 
@@ -133,6 +135,7 @@ vo_to_i(Line *l, int voffset){
 		else
 			++vo;
 	}
+	printf("vo_to_i returning voffset (%d), i (%d), vo (%d)\n", voffset, i, vo);
 	return i;
 }
 
@@ -142,16 +145,18 @@ i_to_vo(Line *l, int offset){
 	if( !l )
 		return -1;
 
+	int given = offset; /* FIXME */
 	/* find highest offset within line */
 	for( ; offset >= l->len; --offset ) ;
 
 	/* find appropriate voffset for offset */
-	for( vo=-1; offset >= 0; --offset ){
-		if( l->contents[offset] == '\t' )
+	for( vo=0; offset > 0; --offset ){
+		if( l->contents[offset-1] == '\t' )
 			vo += tabwidth;
 		else
 			++vo;
 	}
+	printf("i_to_vo returning offset (%d), i(%d), vo (%d)\n", given, offset, vo);
 	return vo;
 }
 

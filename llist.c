@@ -158,8 +158,8 @@ i_to_vo(Line *l, int offset){
 	return vo;
 }
 
-void
-select(Buffer *buf, int linenum, int voffset){
+void /* move cursor to linenum, voffset from current line */
+position_cursor(Buffer *buf, int linenum, int voffset){
 	Line *l;
 	if( ! buf->sstart )
 		return;

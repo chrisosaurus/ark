@@ -196,7 +196,7 @@ buttonpress(XEvent *e){
 	int offset = x / woffset;
 
 	/* FIXME need to deal with tabs and vi... */
-	select(buf, linenum, offset);
+	position_cursor(buf, linenum, offset);
 	draw();
 	display();
 }

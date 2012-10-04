@@ -5,7 +5,7 @@ features:
 
 technical debt:
 	drawing loop, char by char
-	config.h included in llist.c, requires ark.h and ui.h :(
+	config.h included in llist.c, requires ark.h and ui.h. Causes unit tests to not compile
 
 consider:
-
+	behavior of position_cursor when moving through multiple tabs ('snaps' to chars)

@@ -43,9 +43,8 @@ draw(){
 	/* local x used within the drawing loop */
 	int localx;
 
-
 	/* draw all the things */
-	for( l=buf->start, lc=0; l; l=l->next, ++lc ){
+	for( l=buf->sstart, lc=0; l; l=l->next, ++lc ){
 		/*
 		* 	if not y + TextHeight( &pos.line[pos.offset] ) < height
 		* 		break
@@ -63,8 +62,10 @@ draw(){
 		*/
 
 		/* stop if drawing another line would go off the window */
-		if( ! (y+hoffset < height) )
+		if( ! (y+hoffset < height) ){
+			buf->send = l->prev; /* FIXME should it be prev or l? last line, or one past ? */
 			break;
+		}
 
 		localx = x;
 
@@ -92,12 +93,15 @@ draw(){
 		y += hoffset;
 	}
 
-	/* draw the cursor line, offset the x so we don't intersect any characters */
-	/* cpy and cpy+hoffset for unfilled-dumbells, cpy-1 and cpy+hoffset+1 for filled-dumbells */
-	XDrawLine( dpy, pixmap, pixgc, cpx-1, cpy-1, cpx-1, cpy+hoffset+1 );
-	/* draw the 'dumbells' */
-	XDrawRectangle( dpy, pixmap, pixgc, cpx-2, cpy-2, 2, 2 );
-	XDrawRectangle( dpy, pixmap, pixgc, cpx-2, cpy+hoffset, 2, 2 );
+	/* only draw cursor if it is on the screen */
+	if( cpx ){
+		/* draw the cursor line, offset the x so we don't intersect any characters */
+		/* cpy and cpy+hoffset for unfilled-dumbells, cpy-1 and cpy+hoffset+1 for filled-dumbells */
+		XDrawLine( dpy, pixmap, pixgc, cpx-1, cpy-1, cpx-1, cpy+hoffset+1 );
+		/* draw the 'dumbells' */
+		XDrawRectangle( dpy, pixmap, pixgc, cpx-2, cpy-2, 2, 2 );
+		XDrawRectangle( dpy, pixmap, pixgc, cpx-2, cpy+hoffset, 2, 2 );
+	}
 
 	/* x=startx, y=starty
 	 * pos = {line, 0}
@@ -195,9 +199,36 @@ buttonpress(XEvent *e){
 	y -= starty - fascent;
 	int linenum = y / hoffset;
 	int offset = x / woffset;
+	int i;
 
-	/* FIXME need to deal with tabs and vi... */
-	position_cursor(buf, linenum, offset);
+	switch( e->xbutton.button ){
+		case 1: /* left button */
+			position_cursor(buf, linenum, offset);
+			break;
+		case 2: /* middle mouse button */
+			break;
+		case 3: /* right mouse button */
+			break;
+		case 4: /* scroll up */
+			/* FIXME temp, this logic should be elsewhere */
+			for( i=0; i<scrolldistance; ++i ){
+				if( buf->sstart->prev )
+					buf->sstart = buf->sstart->prev;
+				else
+					break;
+			}
+			break;
+		case 5: /* scroll down */
+			/* FIXME temp, this logic should be elsewhere */
+			for( i=0; i<scrolldistance; ++i ){
+				if( buf->sstart->next )
+					buf->sstart = buf->sstart->next;
+				else
+					break;
+			}
+			break;
+	}
+
 	draw();
 	display();
 }

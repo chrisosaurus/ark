@@ -13,4 +13,6 @@ static const char normfbcolor[] = "#eeeeee";
 static const int tabwidth = 4;
 /* string holding the char to insert for each sapce within tabwidht */
 static const char tabchar[] = " ";
+/* number of lines to scrool by */
+static const int scrolldistance = 5;
 

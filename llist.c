@@ -143,7 +143,7 @@ i_to_vo(Line *l, int offset){
 		return -1;
 
 	/* find highest offset within line */
-	for( ; offset >= l->len; --offset ) ;
+	for( ; offset > l->len; --offset ) ;
 
 	/* find appropriate voffset for offset */
 	for( vo=0; offset > 0; --offset ){

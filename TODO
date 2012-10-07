@@ -8,3 +8,4 @@ technical debt:
 
 consider:
 	scrolling in buttonpress, could move elsewhere
+	see tour.golang.org for a nice editor, when pasting the text is set to have the same indentation as the surrounding code.

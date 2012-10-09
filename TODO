@@ -1,10 +1,12 @@
 features:
+	selection
 	ui mouse select
-	complex cursor movement (proper moving down of lines, jump by word, etc. )
 
 technical debt:
 	drawing loop, char by char
 	backspace across lines
+	clicking after end of file should select last line
+	long member variable names
 
 consider:
 	see tour.golang.org for a nice editor, when pasting the text is set to have the same indentation as the surrounding code.

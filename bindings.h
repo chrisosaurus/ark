@@ -31,6 +31,9 @@ static Key keys[] = {
 	{ MODKEY,	XK_k,		f_func,		{ .f=m_nextline } },
 	{ MODKEY,	XK_l,		f_func,		{ .f=m_nextchar } },
 
+	{ MODKEY|SHIFT,	XK_j,		f_func,		{ .f=m_prevword } },
+	{ MODKEY|SHIFT,	XK_l,		f_func,		{ .f=m_nextword } },
+
 	{ CTRL,		XK_i,		f_func,		{ .f=m_prevline } },
 	{ CTRL,		XK_j,		f_func,		{ .f=m_prevchar } },
 	{ CTRL,		XK_k,		f_func,		{ .f=m_nextline } },

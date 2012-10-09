@@ -7,6 +7,27 @@
 
 #define BUFSIZE 80
 
+static int /* return 1 if item breaks a word, otherwise return 0 */
+wordbreak(char ch){
+	switch(ch){
+		case ' ':
+			return 1;
+			break;
+		case '\n':
+			return 1;
+			break;
+		case '\t':
+			return 1;
+			break;
+		case '\0':
+			return 1;
+			break;
+		default:
+			return 0;
+			break;
+	}
+}
+
 Line*
 newline(int mul, Line *prev, Line *next){
 	Line *l = malloc(sizeof(Line));
@@ -111,10 +132,22 @@ m_nextline(Buffer *buf){
 
 void
 m_prevword(Buffer *buf){
+	for( m_prevchar(buf); ; m_prevchar(buf) ){
+		if( wordbreak( buf->cursor.line->contents[buf->cursor.offset] ) )
+			break;
+		if( buf->cursor.offset == 0 )
+			break;
+	}
 }
 
 void
 m_nextword(Buffer *buf){
+	for( m_nextchar(buf); ; m_nextchar(buf) ){
+		if( wordbreak( buf->cursor.line->contents[buf->cursor.offset] ) )
+			break;
+		if( buf->cursor.offset == 0 )
+			break;
+	}
 }
 
 void

@@ -30,6 +30,7 @@ struct Buffer{
 	Line *sstart,*send; /* first and last lines on screen */
 	Pos cursor; /* current cursor position within buffer */
 	char *path; /* relative path to file or 0 */
+	int modified; /* if the buffer has been modified since it was last saved */
 };
 
 /** Movement functions, adjust buf->cursor **/

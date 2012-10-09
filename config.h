@@ -14,5 +14,6 @@ static const int tabwidth = 4;
 /* string holding the char to insert for each sapce within tabwidht */
 static const char tabchar[] = " ";
 /* number of lines to scroll by */
-static const int scrolldistance = 5;
+static const int scrolldistance = 3;
+
 

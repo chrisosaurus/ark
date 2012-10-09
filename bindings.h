@@ -15,6 +15,7 @@ static const char *blahcmd[] = {"echo", "hello"};
 /* key definitions */
 /* Mod1Mask is alt, Mod4Mask is windows key */
 #define MODKEY Mod1Mask
+#define CTRL ControlMask
 
 /* key bindings */
 static Key keys[] = {
@@ -22,6 +23,17 @@ static Key keys[] = {
 	{ MODKEY,	XK_q,		f_quit,		{ .i=0 } },
 	{ MODKEY,	XK_b,		0,		{ .v=blahcmd } },
 	{ MODKEY,	XK_w,		f_save,		{ .i=0 } },
+
+	{ MODKEY,	XK_i,		f_func,		{ .f=m_prevline } },
+	{ MODKEY,	XK_j,		f_func,		{ .f=m_prevchar } },
+	{ MODKEY,	XK_k,		f_func,		{ .f=m_nextline } },
+	{ MODKEY,	XK_l,		f_func,		{ .f=m_nextchar } },
+
+	{ CTRL,		XK_i,		f_func,		{ .f=m_prevline } },
+	{ CTRL,		XK_j,		f_func,		{ .f=m_prevchar } },
+	{ CTRL,		XK_k,		f_func,		{ .f=m_nextline } },
+	{ CTRL,		XK_l,		f_func,		{ .f=m_nextchar } },
+
 	{ 0,		XK_Left,	f_func,		{ .f=m_prevchar } },
 	{ 0,		XK_Right,	f_func,		{ .f=m_nextchar } },
 	{ 0,		XK_Up,		f_func,		{ .f=m_prevline } },

@@ -194,6 +194,7 @@ position_cursor(Buffer *buf, int linenum, int voffset){
 
 void
 backspace(Buffer *buf){
+	buf->modified = 1;
 	if( buf->cursor.offset < 1 ){
 		/* FIXME TODO deal with case of backspacing over lines */
 		return;
@@ -254,6 +255,7 @@ save(Buffer *buf){
 int /* insert at cursor and move cursor along, returns 0 on success and 1 on error */
 insert(Buffer *buf, const char *str){
 	/* inserts character by character, performs far too many memmoves but is simple */
+	buf->modified = 1;
 
 	int i=0, l=strlen(str);
 	int ret; /* return value from insert */

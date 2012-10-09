@@ -9,6 +9,8 @@ static Buffer *buf;
 /* declaration of bindable functions */
 void
 f_quit(const Arg *arg){
+	if( buf && buf->modified )
+		return;
 	ui_stop();
 }
 
@@ -20,6 +22,9 @@ f_func(const Arg *arg){
 
 void /* save */
 f_save(const Arg*arg){
+	if( ! buf )
+		return;
+	buf->modified = 0;
 	/* FIXME need to deal with return code */
 	save(buf);
 }
@@ -52,3 +57,6 @@ main(int argc, char **argv){
 
 	return 0;
 }
+
+
+

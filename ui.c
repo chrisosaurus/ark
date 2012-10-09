@@ -199,7 +199,6 @@ buttonpress(XEvent *e){
 	y -= starty - fascent;
 	int linenum = y / hoffset;
 	int offset = x / woffset;
-	int i;
 
 	switch( e->xbutton.button ){
 		case 1: /* left button */
@@ -210,23 +209,13 @@ buttonpress(XEvent *e){
 		case 3: /* right mouse button */
 			break;
 		case 4: /* scroll up */
-			/* FIXME temp, this logic should be elsewhere */
-			for( i=0; i<scrolldistance; ++i ){
-				if( buf->sstart->prev )
-					buf->sstart = buf->sstart->prev;
-				else
-					break;
-			}
+			m_scrollup(buf);
 			break;
 		case 5: /* scroll down */
-			/* FIXME temp, this logic should be elsewhere */
-			for( i=0; i<scrolldistance; ++i ){
-				if( buf->sstart->next )
-					buf->sstart = buf->sstart->next;
-				else
-					break;
-			}
+			m_scrolldown(buf);
 			break;
+		default:
+			printf("%d\n", e->xbutton.button );
 	}
 
 	draw();

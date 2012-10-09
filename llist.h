@@ -43,6 +43,8 @@ void m_prevline(Buffer *buf);
 void m_nextline(Buffer *buf);
 void m_prevword(Buffer *buf);
 void m_nextword(Buffer *buf);
+void m_scrolldown(Buffer *buf);
+void m_scrollup(Buffer *buf);
 
 /** llist functions **/
 /* load file buf->path into buf, returns 0 on success and 1 on error */

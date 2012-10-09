@@ -117,6 +117,28 @@ void
 m_nextword(Buffer *buf){
 }
 
+void
+m_scrolldown(Buffer *buf){
+	int i;
+	for( i=0; i<scrolldistance; ++i ){
+		if( buf->sstart->next )
+			buf->sstart = buf->sstart->next;
+		else
+			break;
+	}
+}
+
+void
+m_scrollup(Buffer *buf){
+	int i;
+	for( i=0; i<scrolldistance; ++i ){
+		if( buf->sstart->prev )
+			buf->sstart = buf->sstart->prev;
+		else
+			break;
+	}
+
+}
 /** llist functions **/
 int
 vo_to_i(Line *l, int voffset){

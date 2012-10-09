@@ -218,8 +218,11 @@ position_cursor(Buffer *buf, int linenum, int voffset){
 
 	for( l=buf->sstart; linenum && l; --linenum, l=l->next ) ;
 
-	if( !l )
+	if( !l ){
+		buf->cursor.line = buf->end;
+		buf->cursor.offset = buf->end->len;
 		return;
+	}
 
 	buf->cursor.line = l;
 	buf->cursor.offset = vo_to_i(l, voffset);
@@ -325,7 +328,6 @@ insert(Buffer *buf, const char *str){
 			/* move cursor to start of next line */
 			buf->cursor = (Pos){nl, 0};
 			/* copy over old contents */
- /* FIXME TODO this will insert the \n which will cause a trailing newline to be inserted, silly */
 			ret = insert( buf, &ol->contents[oo]);
 			if( ret )
 				return 1;
@@ -344,6 +346,7 @@ insert(Buffer *buf, const char *str){
 			++buf->cursor.offset;
 		}
 	}
+	buf->end = nl;
 	return 0;
 }
 

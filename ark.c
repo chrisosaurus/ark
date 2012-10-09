@@ -9,7 +9,7 @@ static Buffer *buf;
 /* declaration of bindable functions */
 void
 f_quit(const Arg *arg){
-	if( buf && buf->modified )
+	if( !arg->i && buf && buf->modified )
 		return;
 	ui_stop();
 }
@@ -57,6 +57,3 @@ main(int argc, char **argv){
 
 	return 0;
 }
-
-
-

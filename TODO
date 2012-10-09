@@ -5,6 +5,7 @@ features:
 technical debt:
 	drawing loop, char by char
 	backspace across lines
+	a \n is appended on save, everytime..
 
 consider:
 	see tour.golang.org for a nice editor, when pasting the text is set to have the same indentation as the surrounding code.

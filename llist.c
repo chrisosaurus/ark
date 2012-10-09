@@ -232,6 +232,7 @@ load(Buffer *buf){
 			return ret;
 	}
 	fclose(f);
+	buf->modified = 0;
 	/* FIXME consider setting buf->end, I think insert should do this*/
 	return 0;
 }

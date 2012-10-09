@@ -4,7 +4,7 @@
 #include "ui.h"
 
 /** bindable Functions **/
-void f_quit(const Arg *arg);
+void f_quit(const Arg *arg); /* if arg->i then will quit regardless of changes, otherwise will not quit until changes are saved */
 void f_func(const Arg *arg); /* execute function in arg->f */
 void f_save(const Arg *arg);
 

@@ -16,11 +16,13 @@ static const char *blahcmd[] = {"echo", "hello"};
 /* Mod1Mask is alt, Mod4Mask is windows key */
 #define MODKEY Mod1Mask
 #define CTRL ControlMask
+#define SHIFT ShiftMask
 
 /* key bindings */
 static Key keys[] = {
 	/* modifider	key		function	argument */
 	{ MODKEY,	XK_q,		f_quit,		{ .i=0 } },
+	{ MODKEY|SHIFT,	XK_q,		f_quit,		{ .i=1 } },
 	{ MODKEY,	XK_b,		0,		{ .v=blahcmd } },
 	{ MODKEY,	XK_w,		f_save,		{ .i=0 } },
 

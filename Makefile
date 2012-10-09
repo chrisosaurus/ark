@@ -5,7 +5,7 @@
 
 include config.mk
 
-HEADERS = config.def.h llist.h ui.h ark.h
+HEADERS = bindings.def.h config.def.h llist.h ui.h ark.h
 SRC = llist.c ui.c ark.c
 OBJ = ${SRC:.c=.o}
 
@@ -21,7 +21,11 @@ options:
 	@echo CC $<
 	@${CC} -g -c ${CFLAGS} $<
 
-${OBJ}: config.h config.mk
+${OBJ}: bindings.h config.h config.mk
+
+bindings.h:
+	@echo creating $@ from bindings.def.h
+	@cp bindings.def.h $@
 
 config.h:
 	@echo creating $@ from config.def.h

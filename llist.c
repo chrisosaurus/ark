@@ -247,7 +247,8 @@ save(Buffer *buf){
 	}
 	for( l=buf->start ; l; l=l->next ){
 		fwrite(l->contents, sizeof(char), l->len, f);
-		fwrite("\n", sizeof(char), 1, f);
+		if( l->next ) /* only append newline if there is a line following */
+			fwrite("\n", sizeof(char), 1, f);
 	}
 	fclose(f);
 	return 0;

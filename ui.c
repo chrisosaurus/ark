@@ -185,9 +185,9 @@ keypress(XEvent *e){
 		/* see /usr/include/X11/keysymdef.h */
 
 		char *str = keysym_to_charp(keysym);
-		if( ! str[0] && ! str[1] )
-			return;
-		insert(buf, str);
+		if( str[0] ||  str[1] ){
+			insert(buf, str);
+		}
 		free(str);
 		draw();
 		display();

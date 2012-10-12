@@ -230,9 +230,29 @@ position_cursor(Buffer *buf, int linenum, int voffset){
 
 void
 backspace(Buffer *buf){
+	int oo; /* old offset */
+	Line *ol; /* old line */
+
 	buf->modified = 1;
 	if( buf->cursor.offset < 1 ){
 		/* FIXME TODO deal with case of backspacing over lines */
+		oo = buf->cursor.offset;
+		ol = buf->cursor.line;
+
+		/* insert line at end of previous line, correct links, free */
+		if( ! ol->prev )
+			return; /* cannot delete the first line */
+
+		buf->cursor.line = ol->prev;
+		buf->cursor.offset = buf->cursor.line->len;
+		insert(buf, &ol->contents[oo]);
+
+		/* remove links */
+		ol->prev->next = ol->next;
+		if( ol->next )
+			ol->next->prev = ol->prev;
+		free( ol->contents );
+		free(ol);
 		return;
 	}
 	int len = buf->cursor.line->len - buf->cursor.offset + 1;

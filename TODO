@@ -4,10 +4,12 @@ features:
 
 technical debt:
 	drawing loop, char by char
-	backspace across lines
 	long member variable names
 	maintaining buf->end on backspace (across lines)
+	cursor movement off screen should adjust visible sections
 
 consider:
 	see tour.golang.org for a nice editor, when pasting the text is set to have the same indentation as the surrounding code.
-
+	'highest vo' see how vim does moving by line, it will return to vo even if we visit a line with len < vo
+	'matching bracket'
+	'matching scope' (show the bracket that encloses your current scope)

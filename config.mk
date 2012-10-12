@@ -1,7 +1,8 @@
 VERSION = 0.1
 
 PREFIX = /usr/local
-MANPREFIX = ${PREFIX}/share/man
+#MANPREFIX = ${PREFIX}/share/man
+MANPREFIX = /usr/man
 
 INCS = 
 LIBS = -lX11

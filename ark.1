@@ -1,0 +1,49 @@
+.TH ark 1 ark\-VERSION
+
+.SH NAME
+ark \- think moses
+
+.SH SYNOPSIS
+.B ark
+.RI file
+
+.SH DESCRIPTION
+ark is a simple xlib editor
+
+.SH USAGE
+The default key\-bindings try to concentrate around the qwerty resting positions.
+
+.SS Cursor Operations
+.BR Alt\-i
+Move cursor up one line (same offset within line or last character).
+.TP
+.BR Alt\-k
+Move cursor down one line (same offset within line or last character).
+.TP
+.BR Alt\-j
+Move cursor left one char (will 'underflow' to previous line).
+.TP
+.BR Alt\-l
+Move cursor right one char (will 'overflow' to next line).
+.TP
+.BR Alt\-J
+Move cursor left one word (uses whitespace to determine words).
+.TP
+.BR Alt\-L
+Move cursor right one word (uses whitespace to determine words).
+
+.SS File Operations
+.BR Alt\-q
+Quit, will fail for unsaved changes.
+.TP
+.BR Alt\-Q
+Quit regardless of unsaved changes.
+.TP
+.BR Alt\-w
+Write file to disk.
+
+.SH Author
+Buffalo was made by Chris Hall <followingthepath AT gmail d0t com>
+
+.SH Bugs
+Report them.

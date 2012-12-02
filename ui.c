@@ -164,7 +164,7 @@ keypress(XEvent *e){
 	unsigned int i; /* ? */
 	XKeyEvent keyevent = e->xkey;
 	/* we don't take level in to account here as we check for modifiers in the loop below */
-	KeySym keysym = XKeycodeToKeysym(dpy, keyevent.keycode, 0);
+	KeySym keysym = XkbKeycodeToKeysym(dpy, keyevent.keycode, 0, 0);
 
 	for( i=0; i < LENGTH(keys); ++i){
 		if( keysym == keys[i].keysym && keyevent.state == keys[i].mods && keys[i].f_func ){
@@ -179,7 +179,7 @@ keypress(XEvent *e){
 		printf("keycode is shift\n");
 	}
 	if( ! keyevent.state || keyevent.state & ShiftMask ){
-		keysym = XKeycodeToKeysym(dpy, keyevent.keycode, (keyevent.state & ShiftMask));
+		keysym = XkbKeycodeToKeysym(dpy, keyevent.keycode, (keyevent.state & ShiftMask), 0);
 		/* FIXME TODO This is all testing... */
 		/* this doesnt deal with newlines */
 		/* see /usr/include/X11/keysymdef.h */

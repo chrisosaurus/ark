@@ -6,6 +6,7 @@
 /* should the X includes be here or within ark.c ? */
 #include <X11/Xlib.h>
 #include <X11/keysym.h> /* XK_* */
+#include <X11/XKBlib.h> /* XkbKeycodeToKeysym */
 
 #include "llist.h"
 

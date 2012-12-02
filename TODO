@@ -5,13 +5,14 @@ features:
 technical debt:
 	drawing loop, char by char
 	long member variable names
+	variable names are horrid, see http://doc.cat-v.org/bell_labs/pikestyle
 	maintaining buf->end on backspace (across lines)
 	cursor movement off screen should adjust visible sections
 	holding shift with backspace,space or enter should still do that action
 
 consider:
 	see tour.golang.org for a nice editor, when pasting the text is set to have the same indentation as the surrounding code.
-	'highest vo' see how vim does moving by line, it will return to vo even if we visit a line with len < vo
+	'highest vo' see how vim does moving by line, it will return to vo even if we visit a line with len < vo before it
 	'matching bracket'
 	'matching scope' (show the bracket that encloses your current scope)
 	inserting line above/below current and positioning cursor there (sublime uses C+enter and C+S+enter)

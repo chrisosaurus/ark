@@ -32,8 +32,8 @@ static void /* draw the llist to the pixmap */
 draw(){
 	int x=startx, y=starty;
 	Line *l;
-	int i=0, vi=0, lc=0; /* index into l->contents, visual index, line count */
-	int cpy=0, cpx=0; /* cursor pos y, cursor pos x */
+	int i=0, vi=0, lc=0; /* index into l->con, visual index, line count */
+	int cpy=0, cpx=0; /* cur pos y, cur pos x */
 
 	/* clear our pixmap */
 	XSetForeground(dpy, pixgc, white_color);
@@ -69,21 +69,21 @@ draw(){
 
 		localx = x;
 
-		/* we go around for i = l->len as this is a valid position for the cursor and special cases are bad */
+		/* we go around for i = l->len as this is a valid position for the cur and special cases are bad */
 		for( i=0, vi=0; i <= l->len; ++i ){
-			if( i == buf->cursor.offset && l == buf->cursor.line ){
+			if( i == buf->cur.offset && l == buf->cur.line ){
 				cpx = localx;
 				cpy = y-fascent;
 			}
 
-			if( l->contents[i] == '\t' ){
+			if( l->con[i] == '\t' ){
 				do {
 					XDrawString( dpy, pixmap, pixgc, localx, y, tabchar, 1 );
 					localx += woffset;
 				} while( ++vi % tabwidth );
 				continue;
-			} else if( l->contents[i] != '\0' ){
-				XDrawString( dpy, pixmap, pixgc, localx, y, &l->contents[i], 1 );
+			} else if( l->con[i] != '\0' ){
+				XDrawString( dpy, pixmap, pixgc, localx, y, &l->con[i], 1 );
 			}
 
 			localx += woffset;
@@ -93,9 +93,9 @@ draw(){
 		y += hoffset;
 	}
 
-	/* only draw cursor if it is on the screen */
+	/* only draw cur if it is on the screen */
 	if( cpx ){
-		/* draw the cursor line, offset the x so we don't intersect any characters */
+		/* draw the cur line, offset the x so we don't intersect any characters */
 		/* cpy and cpy+hoffset for unfilled-dumbells, cpy-1 and cpy+hoffset+1 for filled-dumbells */
 		XDrawLine( dpy, pixmap, pixgc, cpx-1, cpy-1, cpx-1, cpy+hoffset+1 );
 		/* draw the 'dumbells' */
@@ -194,7 +194,7 @@ keypress(XEvent *e){
 	}
 }
 
-static void /* converts an x,y pair to a cursor position */
+static void /* converts an x,y pair to a cur position */
 buttonpress(XEvent *e){
 	int x=e->xbutton.x, y=e->xbutton.y;
 	x -= startx;

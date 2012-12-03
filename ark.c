@@ -9,7 +9,7 @@ static Buffer *buf;
 /* declaration of bindable functions */
 void
 f_quit(const Arg *arg){
-	if( !arg->i && buf && buf->modified )
+	if( !arg->i && buf && buf->mod )
 		return;
 	ui_stop();
 }
@@ -24,7 +24,7 @@ void /* save */
 f_save(const Arg*arg){
 	if( ! buf )
 		return;
-	buf->modified = 0;
+	buf->mod = 0;
 	/* FIXME need to deal with return code */
 	save(buf);
 }

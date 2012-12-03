@@ -9,7 +9,7 @@
 /* a Line of text */
 typedef struct Line Line;
 struct Line{
-	char *contents; /* \0 terminated, will include any '\n's */
+	char *con; /* contents, \0 terminated, will include any '\n's */
 	int mul; /* the multiple of LINESIZE that is the capacity of this Line */
 	int len; /* number of bytes stored excluding trailing \0 (not chars as utf8 characters are multibyte) */
 	Line *next;
@@ -28,9 +28,9 @@ typedef struct Buffer Buffer;
 struct Buffer{
 	Line *start, *end; /* first and last line */
 	Line *sstart,*send; /* first and last lines on screen */
-	Pos cursor; /* current cursor position within buffer */
+	Pos cur; /* current cursor position within buffer */
 	char *path; /* relative path to file or 0 */
-	int modified; /* if the buffer has been modified since it was last saved */
+	int mod; /* if the buffer has been modified since it was last saved */
 };
 
 /** Movement functions, adjust buf->cursor **/
@@ -56,7 +56,7 @@ int save(Buffer *buf);
 /* recursive specified the behavior of \n */
 int insert(Buffer *buf, const char *str);
 void backspace(Buffer *buf);
-/* select linenum,offset from within screen */
+/* move cursor by linenum and offset */
 void position_cursor(Buffer *buf, int linenum, int offset);
 /* functions for converting voffsets (visual offset on screen, number of spaces occupied)
  * to ioffsers (offset into char array) (and back) using a line, int and TABWIDTH (from config.h)

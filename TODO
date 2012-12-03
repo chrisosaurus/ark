@@ -4,7 +4,6 @@ features:
 
 technical debt:
 	drawing loop, char by char
-	long member variable names
 	variable names are horrid, see http://doc.cat-v.org/bell_labs/pikestyle
 	maintaining buf->end on backspace (across lines)
 	cursor movement off screen should adjust visible sections

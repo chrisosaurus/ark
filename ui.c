@@ -312,9 +312,6 @@ ui_setup(Buffer *buffer){
 	/* calculate offsets */
 	hoffset = fdescent + fascent; /* height offset, ascent + descent */
 	woffset = XTextWidth( xfs, "Z", 1 );
-
-	/* map the window */
-	XMapWindow(dpy, window);
 }
 
 void
@@ -327,8 +324,11 @@ ui_teardown(){
 }
 
 void
-ui_mainloop(){
+ui_mainloop(){ /* Map (display) the window and begin a running loop, can be stopped via ui_stop. Re-entrant. */
 	XEvent e;
+
+	running = 1;
+	XMapWindow(dpy, window);
 	draw();
 	display();
 	for( ; running ; ){
@@ -336,5 +336,6 @@ ui_mainloop(){
 		if( handler[e.type] )
 			handler[e.type](&e);
 	}
+	XUnmapWindow(dpy, window);
 }
 

@@ -15,3 +15,8 @@ consider:
 	'matching bracket'
 	'matching scope' (show the bracket that encloses your current scope)
 	inserting line above/below current and positioning cursor there (sublime uses C+enter and C+S+enter)
+
+ui changes:
+	move anything llist specific 'out' (who knows where to)
+	kill top level ui state, move to a struct?
+

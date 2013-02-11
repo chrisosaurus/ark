@@ -10,6 +10,22 @@
 
 #include "llist.h"
 
+typedef struct ui_window {
+	Display *dpy; //=0;
+	Window xwindow;
+	XWindowAttributes wa;
+	Pixmap pixmap;
+	GC wingc, pixgc;
+	int width, height; //=400, height=400; /* default dimensions */
+	int black_color, white_color;
+	char *title; /* allocated in setup */
+	int startx, starty; /* startx=5, starty=15 starting x and y positions */
+	int hoffset, woffset, fascent, fdescent;/* all set to 0; height and width offset for font, font ascent and descent */
+	int running; /* 0, set to 1 in mainloop, set to 0 in stop */
+	Buffer *buf;
+} ui_window;
+
+
 typedef union Arg Arg;
 union Arg{
 	int i;
@@ -26,15 +42,17 @@ struct Key{ /* structure used in config.h to bind a function to a key */
 };
 
 /* calling this will cause ui_mainloop to return */
-void ui_stop();
+void ui_stop(ui_window *uiw);
 
-/* initialise */
-void ui_setup(Buffer *buffer);
+/* allocated and initialise an ui_window, return it's address OR null on failure */
+ui_window * ui_setup(Buffer *buffer);
 
-/* tidyup */
-void ui_teardown();
+/* tidyup x state, free all needed ui_window properties, and then finally free ui_window */
+void ui_teardown(ui_window *uiw);
 
 /* handles XEvents and dispatches to handlers */
-void ui_mainloop();
+void ui_mainloop(ui_window *uiw);
 
 #endif
+
+

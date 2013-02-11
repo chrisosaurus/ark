@@ -8,43 +8,24 @@
 /* macros */
 #define LENGTH(x) (sizeof x / sizeof x[0])
 
-/** state variables **/
-static Display *dpy=0;
-static Window window;
-static XWindowAttributes wa;
-static Pixmap pixmap;
-static GC wingc, pixgc;
-static int width=400, height=400; /* default dimensions */
-static int black_color, white_color;
-static char *title; /* allocated in setup */
-static int startx=5, starty=15; /* starting x and y positions */
-static int hoffset=0, woffset=0, fascent=0, fdescent=0;/* height and width offset for font, font ascent and descent */
-
-/* set by ui_setup and ui_stop, if 0 then ui_mainloop will return */
-static int running = 0;
-
-/* buffer, shared with ark */
-static Buffer *buf;
-
-
 /* internal functions */
 static void /* draw the llist to the pixmap */
-draw(){
-	int x=startx, y=starty;
+draw(ui_window *uiw){
+	int x=uiw->startx, y=uiw->starty;
 	Line *l;
 	int i=0, vi=0, lc=0; /* index into l->con, visual index, line count */
 	int cpy=0, cpx=0; /* cur pos y, cur pos x */
 
 	/* clear our pixmap */
-	XSetForeground(dpy, pixgc, white_color);
-	XFillRectangle(dpy, pixmap, pixgc, 0, 0, wa.width, wa.height);
-	XSetForeground(dpy, pixgc, black_color);
+	XSetForeground(uiw->dpy, uiw->pixgc, uiw->white_color);
+	XFillRectangle(uiw->dpy, uiw->pixmap, uiw->pixgc, 0, 0, uiw->wa.width, uiw->wa.height);
+	XSetForeground(uiw->dpy, uiw->pixgc, uiw->black_color);
 
 	/* local x used within the drawing loop */
 	int localx;
 
 	/* draw all the things */
-	for( l=buf->sstart, lc=0; l; l=l->next, ++lc ){
+	for( l=uiw->buf->sstart, lc=0; l; l=l->next, ++lc ){
 		/*
 		* 	if not y + TextHeight( &pos.line[pos.offset] ) < height
 		* 		break
@@ -62,8 +43,8 @@ draw(){
 		*/
 
 		/* stop if drawing another line would go off the window */
-		if( ! (y+hoffset < height) ){
-			buf->send = l->prev; /* FIXME should it be prev or l? last line, or one past ? */
+		if( ! (y+uiw->hoffset < uiw->height) ){
+			uiw->buf->send = l->prev; /* FIXME should it be prev or l? last line, or one past ? */
 			break;
 		}
 
@@ -71,36 +52,36 @@ draw(){
 
 		/* we go around for i = l->len as this is a valid position for the cur and special cases are bad */
 		for( i=0, vi=0; i <= l->len; ++i ){
-			if( i == buf->cur.offset && l == buf->cur.line ){
+			if( i == uiw->buf->cur.offset && l == uiw->buf->cur.line ){
 				cpx = localx;
-				cpy = y-fascent;
+				cpy = y-uiw->fascent;
 			}
 
 			if( l->con[i] == '\t' ){
 				do {
-					XDrawString( dpy, pixmap, pixgc, localx, y, tabchar, 1 );
-					localx += woffset;
+					XDrawString( uiw->dpy, uiw->pixmap, uiw->pixgc, localx, y, tabchar, 1 );
+					localx += uiw->woffset;
 				} while( ++vi % tabwidth );
 				continue;
 			} else if( l->con[i] != '\0' ){
-				XDrawString( dpy, pixmap, pixgc, localx, y, &l->con[i], 1 );
+				XDrawString( uiw->dpy, uiw->pixmap, uiw->pixgc, localx, y, &l->con[i], 1 );
 			}
 
-			localx += woffset;
+			localx += uiw->woffset;
 			++vi;
 		}
 
-		y += hoffset;
+		y += uiw->hoffset;
 	}
 
 	/* only draw cur if it is on the screen */
 	if( cpx ){
 		/* draw the cur line, offset the x so we don't intersect any characters */
 		/* cpy and cpy+hoffset for unfilled-dumbells, cpy-1 and cpy+hoffset+1 for filled-dumbells */
-		XDrawLine( dpy, pixmap, pixgc, cpx-1, cpy-1, cpx-1, cpy+hoffset+1 );
+		XDrawLine( uiw->dpy, uiw->pixmap, uiw->pixgc, cpx-1, cpy-1, cpx-1, cpy+uiw->hoffset+1 );
 		/* draw the 'dumbells' */
-		XDrawRectangle( dpy, pixmap, pixgc, cpx-2, cpy-2, 2, 2 );
-		XDrawRectangle( dpy, pixmap, pixgc, cpx-2, cpy+hoffset, 2, 2 );
+		XDrawRectangle( uiw->dpy, uiw->pixmap, uiw->pixgc, cpx-2, cpy-2, 2, 2 );
+		XDrawRectangle( uiw->dpy, uiw->pixmap, uiw->pixgc, cpx-2, cpy+uiw->hoffset, 2, 2 );
 	}
 
 	/* x=startx, y=starty
@@ -127,10 +108,10 @@ draw(){
 }
 
 static void /* copy the pixmap to the window */
-display(){
+display(ui_window *uiw){
 	/* TODO FIXME wa.{width, height} VS {width, height} */
-	XCopyArea( dpy, pixmap, window, wingc, 0, 0, width, height, 0, 0 );
-	XFlush(dpy);
+	XCopyArea( uiw->dpy, uiw->pixmap, uiw->xwindow, uiw->wingc, 0, 0, uiw->width, uiw->height, 0, 0 );
+	XFlush(uiw->dpy);
 }
 
 static char* /* return a string of this KeySym, caller must free returned char* */
@@ -145,7 +126,7 @@ keysym_to_charp(KeySym keysym){
 			cp[0] = '\t';
 			break;
 		case XK_BackSpace:
-			backspace(buf);
+			//backspace(buf); // FIXME TODO XXX should really not be making state changes in here.. bad chris
 			break;
 		default:
 		 	/* Latin 1, see /usr/include/X11/keysymdef.h
@@ -160,17 +141,17 @@ keysym_to_charp(KeySym keysym){
 
 /* event handlers */
 static void
-keypress(XEvent *e){
+keypress(ui_window *uiw, XEvent *e){
 	unsigned int i; /* ? */
 	XKeyEvent keyevent = e->xkey;
 	/* we don't take level in to account here as we check for modifiers in the loop below */
-	KeySym keysym = XkbKeycodeToKeysym(dpy, keyevent.keycode, 0, 0);
+	KeySym keysym = XkbKeycodeToKeysym(uiw->dpy, keyevent.keycode, 0, 0);
 
 	for( i=0; i < LENGTH(keys); ++i){
 		if( keysym == keys[i].keysym && keyevent.state == keys[i].mods && keys[i].f_func ){
 			keys[i].f_func( &(keys[i].arg) );
-			draw();
-			display();
+			draw(uiw);
+			display(uiw);
 			return;
 		}
 	}
@@ -179,74 +160,74 @@ keypress(XEvent *e){
 		printf("keycode is shift\n");
 	}
 	if( ! keyevent.state || keyevent.state & ShiftMask ){
-		keysym = XkbKeycodeToKeysym(dpy, keyevent.keycode, (keyevent.state & ShiftMask), 0);
+		keysym = XkbKeycodeToKeysym(uiw->dpy, keyevent.keycode, (keyevent.state & ShiftMask), 0);
 		/* FIXME TODO This is all testing... */
 		/* this doesnt deal with newlines */
 		/* see /usr/include/X11/keysymdef.h */
 
 		char *str = keysym_to_charp(keysym);
 		if( str[0] ||  str[1] ){
-			insert(buf, str);
+			insert(uiw->buf, str);
 		}
 		free(str);
-		draw();
-		display();
+		draw(uiw);
+		display(uiw);
 	}
 }
 
 static void /* converts an x,y pair to a cur position */
-buttonpress(XEvent *e){
+buttonpress(ui_window *uiw, XEvent *e){
 	int x=e->xbutton.x, y=e->xbutton.y;
-	x -= startx;
-	y -= starty - fascent;
-	int linenum = y / hoffset;
-	int offset = x / woffset;
+	x -= uiw->startx;
+	y -= uiw->starty - uiw->fascent;
+	int linenum = y / uiw->hoffset;
+	int offset = x / uiw->woffset;
 
 	switch( e->xbutton.button ){
 		case 1: /* left button */
-			position_cursor(buf, linenum, offset);
+			position_cursor(uiw->buf, linenum, offset);
 			break;
 		case 2: /* middle mouse button */
 			break;
 		case 3: /* right mouse button */
 			break;
 		case 4: /* scroll up */
-			m_scrollup(buf);
+			m_scrollup(uiw->buf);
 			break;
 		case 5: /* scroll down */
-			m_scrolldown(buf);
+			m_scrolldown(uiw->buf);
 			break;
 		default:
 			printf("%d\n", e->xbutton.button );
 	}
 
-	draw();
-	display();
+	draw(uiw);
+	display(uiw);
 }
 
 static void
-configure(XEvent *e){
+configure(ui_window *uiw, XEvent *e){
 	/* we could get the width and height from e.configure, but we need the depth from the window anyway */
-	XGetWindowAttributes(dpy, window, &wa);
-	width = wa.width;
-	height = wa.height;
+	XGetWindowAttributes(uiw->dpy, uiw->xwindow, &(uiw->wa));
+	uiw->width = uiw->wa.width;
+	uiw->height = uiw->wa.height;
 
 	/* free old pixmap and assosiated graphics context */
-	XFreeGC(dpy, pixgc);
-	XFreePixmap(dpy, pixmap);
+	XFreeGC(uiw->dpy, uiw->pixgc);
+	XFreePixmap(uiw->dpy, uiw->pixmap);
 
 	/* create a new pixmap and graphics context */
-	pixmap = XCreatePixmap(dpy, window, wa.width, wa.height, wa.depth);
-	pixgc = XCreateGC(dpy, pixmap, 0, NULL);
+	uiw->pixmap = XCreatePixmap(uiw->dpy, uiw->xwindow, uiw->wa.width, uiw->wa.height, uiw->wa.depth);
+	uiw->pixgc = XCreateGC(uiw->dpy, uiw->pixmap, 0, NULL);
 
 	/* FIXME TODO now what ? */
 	/* should we cause a draw */
-	draw();
-	display();
+	draw(uiw);
+	display(uiw);
 }
 
 /* array of handlers indexed by XEvent.type */
-static void (* handler[LASTEvent]) (XEvent *) = {
+static void (* handler[LASTEvent]) (ui_window *uiw, XEvent *) = {
 	[KeyPress] = keypress,
 	[ButtonPress] = buttonpress,
 	[ConfigureNotify] = configure
@@ -256,33 +237,44 @@ static void (* handler[LASTEvent]) (XEvent *) = {
 
 /** external interface **/
 void /* cause ui_mainloop to return */
-ui_stop(){
-	running = 0;
+ui_stop(ui_window *uiw){
+	uiw->running = 0;
 }
 
-void
+ui_window * /* allocated and initialized ui_window * OR null */
 ui_setup(Buffer *buffer){
-	buf = buffer;
-	running = 1;
+	ui_window *uiw = calloc(1, sizeof(*uiw));
+	if( ! uiw )
+		return 0; /* FIXME TODO XXX error with malloc, crap */
+
+	uiw->buf = buffer;
+	uiw->running = 1;
+
+	/* FIXME TODO XXX maybe the following should be user configurable */
+	uiw->width = 400;
+	uiw->height = 400;
+	uiw->startx = 5;
+	uiw->starty = 15;
+	/* NB: due to calloc (<3) all other variables are 0 */
 
 	/* open connection and get black and white colours */
-	dpy = XOpenDisplay(NULL);
-	black_color = BlackPixel(dpy, DefaultScreen(dpy));
-	white_color = WhitePixel(dpy, DefaultScreen(dpy));
+	uiw->dpy = XOpenDisplay(NULL);
+	uiw->black_color = BlackPixel(uiw->dpy, DefaultScreen(uiw->dpy));
+	uiw->white_color = WhitePixel(uiw->dpy, DefaultScreen(uiw->dpy));
 
 	/* create window and get attributes */
-	window = XCreateSimpleWindow(dpy, DefaultRootWindow(dpy), 0, 0, width, height, 0, black_color, white_color);
-	XGetWindowAttributes(dpy, window, &wa);
+	uiw->xwindow = XCreateSimpleWindow(uiw->dpy, DefaultRootWindow(uiw->dpy), 0, 0, uiw->width, uiw->height, 0, uiw->black_color, uiw->white_color);
+	XGetWindowAttributes(uiw->dpy, uiw->xwindow, &(uiw->wa));
 
-	/* define out pixmap */
-	pixmap = XCreatePixmap(dpy, window, wa.width, wa.height, wa.depth);
+	/* define our pixmap */
+	uiw->pixmap = XCreatePixmap(uiw->dpy, uiw->xwindow, uiw->wa.width, uiw->wa.height, uiw->wa.depth);
 
 	/* create our graphic contexts */
-	wingc = XCreateGC(dpy, window, 0, NULL);
-	pixgc = XCreateGC(dpy, pixmap, 0, NULL);
+	uiw->wingc = XCreateGC(uiw->dpy, uiw->xwindow, 0, NULL);
+	uiw->pixgc = XCreateGC(uiw->dpy, uiw->pixmap, 0, NULL);
 
 	/* select the events we are interested in */
-	XSelectInput(dpy, window,
+	XSelectInput(uiw->dpy, uiw->xwindow,
 				StructureNotifyMask /* MapNotify, ConfigureNotify */
 				| KeyPressMask /* KeyPress, KeyRelease */
 				| ExposureMask /* Expose */
@@ -293,49 +285,52 @@ ui_setup(Buffer *buffer){
 		);
 
 	/* set the title */
-	if( buf->path ){
+	if( uiw->buf->path ){
 		/* \0 + strlen("ark ") + strlen(buf->path) */
-		int len = 1 + 4 + strlen(buf->path);
-		title = malloc( len );
-		snprintf(title, len, "ark %s", buf->path);
+		int len = 1 + 4 + strlen(uiw->buf->path);
+		uiw->title = malloc( len );
+		snprintf(uiw->title, len, "ark %s", uiw->buf->path);
 	} else
-		title = "ark";
-	XStoreName(dpy, window, title);
+		uiw->title = "ark";
+	XStoreName(uiw->dpy, uiw->xwindow, uiw->title);
 
 	/* get font information */
 	/* get text information */
-	XFontStruct *xfs = XQueryFont(dpy, XGContextFromGC(pixgc));
+	XFontStruct *xfs = XQueryFont(uiw->dpy, XGContextFromGC(uiw->pixgc));
 	XCharStruct ch; /* FIXME TODO wtf is this used for? XFontStruct contains these, which char is this for? etc? */
 	int dir; /* direction return */
 	/* this assumes that our strings are all similar, could do per string */
-	XTextExtents( xfs, "aAzZ1", 5, &dir, &fascent, &fdescent, &ch);
+	XTextExtents( xfs, "aAzZ1", 5, &dir, &(uiw->fascent), &(uiw->fdescent), &ch);
 	/* calculate offsets */
-	hoffset = fdescent + fascent; /* height offset, ascent + descent */
-	woffset = XTextWidth( xfs, "Z", 1 );
+	uiw->hoffset = uiw->fdescent + uiw->fascent; /* height offset, ascent + descent */
+	uiw->woffset = XTextWidth( xfs, "Z", 1 );
+
+	return uiw;
+}
+
+void /* tidy up and free all needed elements of uiw, before freeing ui_window */
+ui_teardown(ui_window *uiw){
+	XFreePixmap(uiw->dpy, uiw->pixmap);
+	XFreeGC(uiw->dpy, uiw->wingc); /* may fail but do we care? */
+	XFreeGC(uiw->dpy, uiw->pixgc);
+	XCloseDisplay(uiw->dpy);
+	free(uiw->title);
+	free(uiw);
 }
 
 void
-ui_teardown(){
-	XFreePixmap(dpy, pixmap);
-	XFreeGC(dpy, wingc); /* may fail but do we care? */
-	XFreeGC(dpy, pixgc);
-	XCloseDisplay(dpy);
-	free(title);
-}
-
-void
-ui_mainloop(){ /* Map (display) the window and begin a running loop, can be stopped via ui_stop. Re-entrant. */
+ui_mainloop(ui_window *uiw){ /* Map (display) the window and begin a running loop, can be stopped via ui_stop. Re-entrant. */
 	XEvent e;
 
-	running = 1;
-	XMapWindow(dpy, window);
-	draw();
-	display();
-	for( ; running ; ){
-		XNextEvent(dpy, &e);
+	uiw->running = 1;
+	XMapWindow(uiw->dpy, uiw->xwindow);
+	draw(uiw);
+	display(uiw);
+	for( ; uiw->running ; ){
+		XNextEvent(uiw->dpy, &e);
 		if( handler[e.type] )
-			handler[e.type](&e);
+			handler[e.type](uiw, &e);
 	}
-	XUnmapWindow(dpy, window);
+	XUnmapWindow(uiw->dpy, uiw->xwindow);
 }
 

@@ -149,7 +149,7 @@ keypress(ui_window *uiw, XEvent *e){
 
 	for( i=0; i < LENGTH(keys); ++i){
 		if( keysym == keys[i].keysym && keyevent.state == keys[i].mods && keys[i].f_func ){
-			keys[i].f_func( &(keys[i].arg) );
+			keys[i].f_func( uiw, &(keys[i].arg) );
 			draw(uiw);
 			display(uiw);
 			return;

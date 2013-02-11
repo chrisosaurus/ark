@@ -37,7 +37,7 @@ typedef struct Key Key;
 struct Key{ /* structure used in config.h to bind a function to a key */
 	int mods; /* modifiers */
 	KeySym keysym; /* keysym to bind to */
-	void (*f_func) (const Arg *arg); /* function to call */
+	void (*f_func) (ui_window *uiw, const Arg *arg); /* function to call */
 	const Arg arg; /* argument to pass */
 };
 

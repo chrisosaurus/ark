@@ -43,6 +43,7 @@ static Key keys[] = {
 	{ 0,		XK_Right,	f_func,		{ .f=m_nextchar } },
 	{ 0,		XK_Up,		f_func,		{ .f=m_prevline } },
 	{ 0,		XK_Down,	f_func,		{ .f=m_nextline } },
+	{ 0,		XK_BackSpace,	f_func,		{ .f=backspace } },
 
 	{ CTRL,		XK_Left,	f_func,		{ .f=m_prevword } },
 	{ CTRL,		XK_Right,	f_func,		{ .f=m_nextword } }

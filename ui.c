@@ -126,7 +126,8 @@ keysym_to_charp(KeySym keysym){
 			cp[0] = '\t';
 			break;
 		case XK_BackSpace:
-			//backspace(buf); // FIXME TODO XXX should really not be making state changes in here.. bad chris
+			/* this should be impossible now, due to backspace being caught in bindings .h */
+			puts("ERROR: backspace caught in keysym_to_charp, this should be impossible");
 			break;
 		default:
 		 	/* Latin 1, see /usr/include/X11/keysymdef.h

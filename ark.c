@@ -1,5 +1,3 @@
-#include <stdlib.h>
-#include "ark.h"
 #include "ui.h"
 #include "llist.h"
 
@@ -18,7 +16,7 @@ f_func(ui_window *uiw, const Arg *arg){
 }
 
 void /* save */
-f_save(ui_window *uiw, const Arg*arg){
+f_save(ui_window *uiw, const Arg *arg){
 	if( ! uiw->buf )
 		return;
 	uiw->buf->mod = 0;

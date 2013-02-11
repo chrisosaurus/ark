@@ -13,10 +13,23 @@ consider:
 	see tour.golang.org for a nice editor, when pasting the text is set to have the same indentation as the surrounding code.
 	'highest vo' see how vim does moving by line, it will return to vo even if we visit a line with len < vo before it
 	'matching bracket'
-	'matching scope' (show the bracket that encloses your current scope)
+	'matching scope' (show the brackets that encloses your current scope)
 	inserting line above/below current and positioning cursor there (sublime uses C+enter and C+S+enter)
 
-ui changes:
-	move anything llist specific 'out' (who knows where to)
-	kill top level ui state, move to a struct?
+
+the dep graph for this project is as follows:
+
+	ui
+	 |\
+	 | \
+	 |  v
+	 |  ark
+	 |   |
+	 v   v
+	llist
+
+that is to say that ui makes call to ark and llist, and ark makes calls to llist. llist can call no-one.  
+NB: ui includes both ark and llist  
+NB: ark includes both llist and ui  
+NB: llist can see neither ui nor ark  
 

@@ -143,6 +143,7 @@ keysym_to_charp(KeySym keysym){
 /* event handlers */
 static void
 keypress(ui_window *uiw, XEvent *e){
+/* FIXME rip this out, see dmenu.c:237 keypress */
 	unsigned int i; /* ? */
 	XKeyEvent keyevent = e->xkey;
 	/* we don't take level in to account here as we check for modifiers in the loop below */

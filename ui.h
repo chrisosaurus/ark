@@ -54,5 +54,3 @@ void ui_teardown(ui_window *uiw);
 void ui_mainloop(ui_window *uiw);
 
 #endif
-
-

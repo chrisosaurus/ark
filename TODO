@@ -16,6 +16,10 @@ consider:
 	'matching scope' (show the brackets that encloses your current scope)
 	inserting line above/below current and positioning cursor there (sublime uses C+enter and C+S+enter)
 
+bugs:
+	opening a terminal over (monocle mode) and then closing the term (ctrl-d) causes a blank window to be drawn, win-k twice fixes this
+	uppercase doesnt work (shift breaks shit)
+
 
 the dep graph for this project is as follows:
 

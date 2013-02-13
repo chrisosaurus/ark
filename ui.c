@@ -114,7 +114,7 @@ display(ui_window *uiw){
 	XFlush(uiw->dpy);
 }
 
-/* event handlers */
+/** event handlers **/
 static void
 keypress(ui_window *uiw, XEvent *e){
 	unsigned int i; /* for loop count */
@@ -143,7 +143,8 @@ keypress(ui_window *uiw, XEvent *e){
 	}
 
 	/* handle inserting */
-	if( !(keyevent.state & Mod1Mask & Mod4Mask & ControlMask ) && len ){
+    /* only insert if we are not pressing Mod1 (alt), Mod4 (win), or Control */
+	if( !(keyevent.state & (Mod1Mask | Mod4Mask | ControlMask) ) && len ){
 		printf("INSERTING : char (%s), dec (%d)\n", buf, buf); /* FIXME debugging */
 		insert(uiw->buf, buf);
 		draw(uiw);

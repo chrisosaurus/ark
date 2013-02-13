@@ -23,6 +23,8 @@ typedef struct ui_window {
 	int hoffset, woffset, fascent, fdescent;/* all set to 0; height and width offset for font, font ascent and descent */
 	int running; /* 0, set to 1 in mainloop, set to 0 in stop */
 	Buffer *buf;
+	XIM xim; /* X Input Method */
+	XIC xic; /* X Input Context */
 } ui_window;
 
 

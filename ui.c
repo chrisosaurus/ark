@@ -114,64 +114,38 @@ display(ui_window *uiw){
 	XFlush(uiw->dpy);
 }
 
-static char* /* return a string of this KeySym, caller must free returned char* */
-keysym_to_charp(KeySym keysym){
-	char *cp = calloc(sizeof(char), 2);
-	/* need a nicer mapping */
-	switch(keysym){
-		case XK_Return:
-			cp[0] = '\n';
-			break;
-		case XK_Tab:
-			cp[0] = '\t';
-			break;
-		case XK_BackSpace:
-			/* this should be impossible now, due to backspace being caught in bindings .h */
-			puts("ERROR: backspace caught in keysym_to_charp, this should be impossible");
-			break;
-		default:
-		 	/* Latin 1, see /usr/include/X11/keysymdef.h
-		 	*  need to extend later to be unicode aware
-		 	*/
-			if( keysym < 0x0100 )
-				cp[0] = keysym;
-			break;
-	}
-	return cp;
-}
-
 /* event handlers */
 static void
 keypress(ui_window *uiw, XEvent *e){
-/* FIXME rip this out, see dmenu.c:237 keypress */
-	unsigned int i; /* ? */
+	unsigned int i; /* for loop count */
+	char buf[32];
+	int len = 0;
+	KeySym k2;
+	Status status;
 	XKeyEvent keyevent = e->xkey;
+
 	/* we don't take level in to account here as we check for modifiers in the loop below */
 	KeySym keysym = XkbKeycodeToKeysym(uiw->dpy, keyevent.keycode, 0, 0);
+	len = XmbLookupString(uiw->xic, &keyevent, buf, sizeof buf, &k2, &status);
+	buf[len] = '\0'; /* XmbLookupString doesn't null terminate */
 
+	if( status == XBufferOverflow )
+		return;
+
+	/* handle bindings */
 	for( i=0; i < LENGTH(keys); ++i){
 		if( keysym == keys[i].keysym && keyevent.state == keys[i].mods && keys[i].f_func ){
 			keys[i].f_func( uiw, &(keys[i].arg) );
 			draw(uiw);
 			display(uiw);
-			return;
+			return; /* if we don't return here, bindings like BackSpace will be inserted below */
 		}
 	}
 
-	if( keyevent.keycode == 0xffe9 ){
-		printf("keycode is shift\n");
-	}
-	if( ! keyevent.state || keyevent.state & ShiftMask ){
-		keysym = XkbKeycodeToKeysym(uiw->dpy, keyevent.keycode, (keyevent.state & ShiftMask), 0);
-		/* FIXME TODO This is all testing... */
-		/* this doesnt deal with newlines */
-		/* see /usr/include/X11/keysymdef.h */
-
-		char *str = keysym_to_charp(keysym);
-		if( str[0] ||  str[1] ){
-			insert(uiw->buf, str);
-		}
-		free(str);
+	/* handle inserting */
+	if( !(keyevent.state & Mod1Mask & Mod4Mask & ControlMask ) && len ){
+		printf("INSERTING : char (%s), dec (%d)\n", buf, buf); /* FIXME debugging */
+		insert(uiw->buf, buf);
 		draw(uiw);
 		display(uiw);
 	}
@@ -259,10 +233,15 @@ ui_setup(Buffer *buffer){
 	uiw->starty = 15;
 	/* NB: due to calloc (<3) all other variables are 0 */
 
-	/* open connection and get black and white colours */
+	/* open connection, create an input method and context */
 	uiw->dpy = XOpenDisplay(NULL);
+	uiw->xim = XOpenIM(uiw->dpy, NULL, NULL, NULL);
+	uiw->xic = XCreateIC(uiw->xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, XNClientWindow, uiw->xwindow, NULL);
+
+	/* get black and white colours */
 	uiw->black_color = BlackPixel(uiw->dpy, DefaultScreen(uiw->dpy));
 	uiw->white_color = WhitePixel(uiw->dpy, DefaultScreen(uiw->dpy));
+
 
 	/* create window and get attributes */
 	uiw->xwindow = XCreateSimpleWindow(uiw->dpy, DefaultRootWindow(uiw->dpy), 0, 0, uiw->width, uiw->height, 0, uiw->black_color, uiw->white_color);

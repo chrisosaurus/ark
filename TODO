@@ -5,7 +5,7 @@ features:
 
 technical debt:
 	line wrap - currently cursor and line go off screen.
-	drawing loop, char by char
+	drawing loop, char by char - could instead cache up into a larger string and then draw this
 	maintaining buf->end on backspace (across lines)
 	cursor movement off screen should adjust visible sections - cursor should always be on screen
 	bindings now (after new input handling) has to take shift into account twice, once in mods (|SHIFT) and once in key (XK_Q instead of XK_q) (NB: there is always 32 difference between UC nad LC, could check for ShiftMask in mods and check value of keys, and silently convert)

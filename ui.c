@@ -15,7 +15,7 @@ static void /* draw the llist to the pixmap */
 draw(ui_window *uiw){
 	int x=uiw->startx, y=uiw->starty;
 	Line *l;
-	int i=0, vi=0, lc=0; /* index into l->con, visual index, line count */
+	int i=0, vi=0; /* index into l->con, visual index */
 	int cpy=0, cpx=0; /* cur pos y, cur pos x */
 
 	/* clear our pixmap */
@@ -27,7 +27,7 @@ draw(ui_window *uiw){
 	int localx;
 
 	/* draw all the things */
-	for( l=uiw->buf->sstart, lc=0; l; l=l->next, ++lc ){
+	for( l=uiw->buf->sstart; l; l=l->next ){
 		/*
 		* 	if not y + TextHeight( &pos.line[pos.offset] ) < height
 		* 		break

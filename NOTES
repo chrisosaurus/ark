@@ -2,3 +2,20 @@ llist functions have to be wrapped by ark functions in order to be callable by u
 This is because the llist code does not (and should not) include the ui code.
 
 
+the dep graph for this project is as follows:
+
+	ui
+	 |\
+	 | \
+	 |  v
+	 |  ark
+	 |   |
+	 v   v
+	llist
+
+that is to say that ui makes call to ark and llist, and ark makes calls to llist. llist can call no-one.  
+NB: ui includes both ark and llist  
+NB: ark includes both llist and ui  
+NB: llist can see neither ui nor ark  
+
+

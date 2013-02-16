@@ -5,7 +5,7 @@ features:
 technical debt:
 	drawing loop, char by char
 	maintaining buf->end on backspace (across lines)
-	cursor movement off screen should adjust visible sections
+	cursor movement off screen should adjust visible sections - cursor should always be on screen
 	bindings now (after new input handling) has to take shift into account twice, once in mods (|SHIFT) and once in key (XK_Q instead of XK_q) (NB: there is always 32 difference between UC nad LC, could check for ShiftMask in mods and check value of keys, and silently convert)
 
 consider:
@@ -17,21 +17,4 @@ consider:
 
 bugs:
 	opening a terminal over (monocle mode) and then closing the term (ctrl-d) causes a blank window to be drawn, win-k twice fixes this
-
-
-the dep graph for this project is as follows:
-
-	ui
-	 |\
-	 | \
-	 |  v
-	 |  ark
-	 |   |
-	 v   v
-	llist
-
-that is to say that ui makes call to ark and llist, and ark makes calls to llist. llist can call no-one.  
-NB: ui includes both ark and llist  
-NB: ark includes both llist and ui  
-NB: llist can see neither ui nor ark  
 

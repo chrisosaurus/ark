@@ -3,6 +3,8 @@ features:
 	ui mouse select
 
 technical debt:
+	opening a file that doesn't exist (new or mistake) should be handled gracefully (rather than blank window opening and error on STDERR)
+	line wrap - currently cursor and line go off screen.
 	drawing loop, char by char
 	maintaining buf->end on backspace (across lines)
 	cursor movement off screen should adjust visible sections - cursor should always be on screen

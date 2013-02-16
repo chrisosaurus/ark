@@ -55,8 +55,8 @@ newbuffer(char *path){
 		perror("Failed to ammloc in llist:newfile for b ");
 		return 0; /* error */
 	}
-	b->sstart = b->start = 0;
-	b->send = b->end = 0;
+	b->s_start = b->start = 0;
+	b->s_end = b->end = 0;
 	b->path = path;
 	return b;
 }
@@ -154,8 +154,8 @@ void
 m_scrolldown(Buffer *buf){
 	int i;
 	for( i=0; i<scrolldistance; ++i ){
-		if( buf->sstart->next )
-			buf->sstart = buf->sstart->next;
+		if( buf->s_start->next )
+			buf->s_start = buf->s_start->next;
 		else
 			break;
 	}
@@ -165,8 +165,8 @@ void
 m_scrollup(Buffer *buf){
 	int i;
 	for( i=0; i<scrolldistance; ++i ){
-		if( buf->sstart->prev )
-			buf->sstart = buf->sstart->prev;
+		if( buf->s_start->prev )
+			buf->s_start = buf->s_start->prev;
 		else
 			break;
 	}
@@ -213,10 +213,10 @@ i_to_vo(Line *l, int offset){
 void /* move cur to linenum, voffset from current line */
 position_cursor(Buffer *buf, int linenum, int voffset){
 	Line *l;
-	if( ! buf->sstart )
+	if( ! buf->s_start )
 		return;
 
-	for( l=buf->sstart; linenum && l; --linenum, l=l->next ) ;
+	for( l=buf->s_start; linenum && l; --linenum, l=l->next ) ;
 
 	if( !l ){
 		buf->cur.line = buf->end;
@@ -275,8 +275,8 @@ load(Buffer *buf){
 	}
 
 	if( ! buf->start){
-		buf->sstart = buf->start = newline(1, 0, 0);
-		buf->send = buf->end = buf->start;
+		buf->s_start = buf->start = newline(1, 0, 0);
+		buf->s_end = buf->end = buf->start;
 		buf->cur = (Pos){buf->start, 0};
 	}
 

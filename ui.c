@@ -27,7 +27,7 @@ draw(ui_window *uiw){
 	int localx;
 
 	/* draw all the things */
-	for( l=uiw->buf->sstart; l; l=l->next ){
+	for( l=uiw->buf->s_start; l; l=l->next ){
 		/*
 		* 	if not y + TextHeight( &pos.line[pos.offset] ) < height
 		* 		break
@@ -46,7 +46,7 @@ draw(ui_window *uiw){
 
 		/* stop if drawing another line would go off the window */
 		if( ! (y+uiw->hoffset < uiw->height) ){
-			uiw->buf->send = l->prev; /* FIXME should it be prev or l? last line, or one past ? */
+			uiw->buf->s_end = l->prev; /* FIXME should it be prev or l? last line, or one past ? */
 			break;
 		}
 

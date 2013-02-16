@@ -27,7 +27,7 @@ struct Pos{
 typedef struct Buffer Buffer;
 struct Buffer{
 	Line *start, *end; /* first and last line */
-	Line *sstart,*send; /* first and last lines on screen */
+	Line *s_start,*s_end; /* first and last lines on screen ('screen_start' and 'screen_end')*/
 	Pos cur; /* current cursor position within buffer */
 	char *path; /* relative path to file or 0 */
 	int mod; /* if the buffer has been modified since it was last saved */

@@ -5,6 +5,8 @@
 #include "config.h"
 #include "bindings.h"
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 /* macros */
 #define LENGTH(x) (sizeof x / sizeof x[0])
 

@@ -1,6 +1,8 @@
 #include "ui.h"
 #include "llist.h"
 
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 /* declaration of bindable functions */
 void
 f_quit(ui_window *uiw, const Arg *arg){

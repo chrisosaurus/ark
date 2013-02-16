@@ -205,11 +205,18 @@ configure(ui_window *uiw, XEvent *e){
 	display(uiw);
 }
 
+static void /* window display information has been lost, need to re-copy */
+expose(ui_window *uiw, XEvent *e){
+	display(uiw);
+}
+
+
 /* array of handlers indexed by XEvent.type */
 static void (* handler[LASTEvent]) (ui_window *uiw, XEvent *) = {
 	[KeyPress] = keypress,
 	[ButtonPress] = buttonpress,
-	[ConfigureNotify] = configure
+	[ConfigureNotify] = configure,
+	[Expose] = expose
 };
 
 /** internal functions **/

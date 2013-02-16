@@ -19,7 +19,11 @@ main(int argc, char **argv){
 		return 1;
 	}
 
-	load(buf); /* llist / buffer */
+	if( load(buf)) { /* llist / buffer */
+		/* error in loading file, bail out */
+		free(buf);
+		return 1;
+	}
 	m_startoffile(buf); /* llist / buffer */
 
 	/* FIXME need to sort out isolation between ui, ark and llist. The below 2 lines are problematic (uiw isnt init) */

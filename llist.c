@@ -32,7 +32,7 @@ Line*
 newline(int mul, Line *prev, Line *next){
 	Line *l = malloc(sizeof(Line));
 	if( !l ){
-		perror("Failed to malloc in llist:newline for ");
+		perror("Failed to malloc in llist:newline for l ");
 		return 0; /* error */
 	}
 	l->prev = prev;
@@ -41,7 +41,7 @@ newline(int mul, Line *prev, Line *next){
 	l->len = 0;
 	l->con = malloc( sizeof(char) * LINESIZE * mul );
 	if( ! l->con ){
-		perror("Failed to malloc in llist:newline for l->con");
+		perror("Failed to malloc in llist:newline for l->con ");
 		return 0; /* error */
 	}
 	l->con[0] = 0;
@@ -52,7 +52,7 @@ Buffer*
 newbuffer(char *path){
 	Buffer *b = malloc(sizeof(Buffer));
 	if( !b ){
-		perror("Failed to ammloc in llist:newfile for ");
+		perror("Failed to ammloc in llist:newfile for b ");
 		return 0; /* error */
 	}
 	b->sstart = b->start = 0;
@@ -269,7 +269,8 @@ load(Buffer *buf){
 	FILE *f = fopen(buf->path, "r");
 
 	if( !f ){
-		perror("Failed to open buf->path in llist:load : ");
+		fprintf(stderr, "Error opening file '%s'", buf->path);
+		perror(" in llist:load (passed as buf->path) ");
 		return 1; /* error */
 	}
 
@@ -298,7 +299,7 @@ save(Buffer *buf){
 	Line *l;
 	FILE *f = fopen(buf->path, "w");
 	if( !f ){
-		perror("Failed to open buf->path in llist:save : ");
+		perror("Failed to open buf->path in llist:save ");
 		return 1; /* error */
 	}
 	for( l=buf->start ; l; l=l->next ){
@@ -325,7 +326,7 @@ insert(Buffer *buf, const char *str){
 		if( buf->cur.line->len + 2 > buf->cur.line->mul * LINESIZE ){
 			buf->cur.line->con = realloc(buf->cur.line->con, ++buf->cur.line->mul * LINESIZE);
 			if( ! buf->cur.line->con ){
-				perror("Failed realloc in llist:insert");
+				perror("Failed realloc in llist:insert ");
 				return 1; /* FIXME error */
 			}
 		}
@@ -333,7 +334,7 @@ insert(Buffer *buf, const char *str){
 		if( str[i] == '\n' || str[i] == '\r' ){
 			nl = newline(1, buf->cur.line, buf->cur.line->next);
 			if( ! nl ){
-				perror("Failed call to newline from llist:insert");
+				perror("Failed call to newline from llist:insert ");
 				return 1; /* FIXME error */
 			}
 			if( buf->cur.line->next )

@@ -8,6 +8,7 @@ technical debt:
 	maintaining buf->end on backspace (across lines)
 	cursor movement off screen should adjust visible sections
 	holding shift with backspace,space or enter should still do that action
+	bindings now (after nex input handling) has to take shift into account twice, once in mods (|SHIFT) and once in key (XK_Q instead of XK_q) (NB: there is always 32 difference between UC nad LC, could check for ShiftMask in mods and check value of keys, and silently convert)
 
 consider:
 	see tour.golang.org for a nice editor, when pasting the text is set to have the same indentation as the surrounding code.

@@ -120,13 +120,11 @@ keypress(ui_window *uiw, XEvent *e){
 	unsigned int i; /* for loop count */
 	char buf[32];
 	int len = 0;
-	KeySym k2;
+	KeySym keysym;
 	Status status;
 	XKeyEvent keyevent = e->xkey;
 
-	/* we don't take level in to account here as we check for modifiers in the loop below */
-	KeySym keysym = XkbKeycodeToKeysym(uiw->dpy, keyevent.keycode, 0, 0);
-	len = XmbLookupString(uiw->xic, &keyevent, buf, sizeof buf, &k2, &status);
+	len = XmbLookupString(uiw->xic, &keyevent, buf, sizeof buf, &keysym, &status);
 	buf[len] = '\0'; /* XmbLookupString doesn't null terminate */
 
 	if( status == XBufferOverflow )

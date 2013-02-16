@@ -143,7 +143,9 @@ keypress(ui_window *uiw, XEvent *e){
 	/* handle inserting */
     /* only insert if we are not pressing Mod1 (alt), Mod4 (win), or Control */
 	if( !(keyevent.state & (Mod1Mask | Mod4Mask | ControlMask) ) && len ){
+#pragma GCC diagnostic ignored "-Wformat"
 		printf("INSERTING : char (%s), dec (%d)\n", buf, buf); /* FIXME debugging */
+#pragma GCC diagnostic warning "-Wformat"
 		insert(uiw->buf, buf);
 		draw(uiw);
 		display(uiw);

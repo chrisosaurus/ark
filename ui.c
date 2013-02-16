@@ -281,10 +281,10 @@ ui_setup(Buffer *buffer){
 	/* get font information */
 	/* get text information */
 	XFontStruct *xfs = XQueryFont(uiw->dpy, XGContextFromGC(uiw->pixgc));
-	XCharStruct ch; /* FIXME TODO wtf is this used for? XFontStruct contains these, which char is this for? etc? */
+	XCharStruct xcs; /* FIXME TODO wtf is this used for? XFontStruct contains these, which char is this for? etc? */
 	int dir; /* direction return */
 	/* this assumes that our strings are all similar, could do per string */
-	XTextExtents( xfs, "aAzZ1", 5, &dir, &(uiw->fascent), &(uiw->fdescent), &ch);
+	XTextExtents( xfs, "aAzZ1", 5, &dir, &(uiw->fascent), &(uiw->fdescent), &xcs);
 	/* calculate offsets */
 	uiw->hoffset = uiw->fdescent + uiw->fascent; /* height offset, ascent + descent */
 	uiw->woffset = XTextWidth( xfs, "Z", 1 );

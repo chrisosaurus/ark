@@ -1,8 +1,8 @@
 features:
 	selection
-		- break Line into llist and line (llist is linked list, make it first member of line)
-		- create a span struct similar to line above
-		- make the magic happen
+		- create a span struct (see Line in Buffer.h for an example)
+		- add system for tying spans to styles (colours, text styles, maybe fonts, etc.)
+		- make the magic happen (modify ui drawing loop)
 	ui mouse select
 	should be able to create new files
 

@@ -6,12 +6,12 @@
 /* insert item after pre and before next,
  * return 0 on success and 1 on failure */
 int ll_insert(void *item, void *prev, void *next){
-	ll_remove(item);
 	Llist *li = item;
 	Llist *lp = prev;
 	Llist *ln = next;
 
 	if( ! li ) return 1;
+	ll_remove(li); /* if li is already within a list, we should be kind to it and remove it (avoids creating inconsistencies) */
 
 	if( lp )
 		lp->next = li;

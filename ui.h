@@ -8,7 +8,7 @@
 #include <X11/keysym.h> /* XK_* */
 #include <X11/XKBlib.h> /* XkbKeycodeToKeysym */
 
-#include "llist.h"
+#include "line.h"
 
 typedef struct ui_window {
 	Display *dpy; //=0;

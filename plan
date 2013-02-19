@@ -1,11 +1,3 @@
-llist becomes a super type
-
-make operator functions 'on' it that take and return `void *`
-
-move line and buffer stuff into another file
-
----
-
 create a span
 
 begin work on styling (draw loop)

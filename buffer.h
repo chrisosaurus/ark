@@ -3,6 +3,8 @@
 
 #include "llist.h"
 
+/** datastructures required for dealing with a buffer (a view of a file) **/
+
 /* lines are allocated with lenghts that are multiples of LINESIZE */
 #define LINESIZE 80
 

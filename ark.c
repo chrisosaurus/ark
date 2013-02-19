@@ -1,5 +1,5 @@
 #include "ui.h"
-#include "line.h"
+#include "buffer.h"
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 

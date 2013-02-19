@@ -5,8 +5,8 @@
 
 include config.mk
 
-HEADERS = bindings.def.h config.def.h llist.h ui.h ark.h line.h
-SRC = llist.c line.c ark.c ui.c main.c
+HEADERS = bindings.def.h config.def.h llist.h ui.h ark.h buffer.h
+SRC = llist.c buffer.c ark.c ui.c main.c
 OBJ = ${SRC:.c=.o}
 
 all: options ark 

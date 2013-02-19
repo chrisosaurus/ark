@@ -1,4 +1,4 @@
-#include "line.h"
+#include "buffer.h"
 #include "ark.h"
 #include "ui.h"
 #include <stdlib.h> /* free */

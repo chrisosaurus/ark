@@ -2,7 +2,7 @@
 #include <stdlib.h> /* calloc, realloc */
 #include <string.h> /* strlen, memove */
 
-#include "line.h"
+#include "buffer.h"
 #include "config.h"
 
 #define BUFSIZE 80

@@ -1,4 +1,4 @@
-#include <stdlib.h> /* calloc, free, malloc */
+#include <stdlib.h> /* calloc, free, calloc */
 #include <string.h> /* strlen */
 #include "ui.h"
 #include "ark.h"
@@ -27,7 +27,7 @@ draw(ui_window *uiw){
 	int localx;
 
 	/* draw all the things */
-	for( l=uiw->buf->s_start; l; l=l->next ){
+	for( l=uiw->buf->s_start; l; l=ll_next(l) ){
 		/*
 		* 	if not y + TextHeight( &pos.line[pos.offset] ) < height
 		* 		break
@@ -46,7 +46,7 @@ draw(ui_window *uiw){
 
 		/* stop if drawing another line would go off the window */
 		if( ! (y+uiw->hoffset < uiw->height) ){
-			uiw->buf->s_end = l->prev; /* FIXME should it be prev or l? last line, or one past ? */
+			uiw->buf->s_end = ll_prev(l); /* FIXME should it be prev or l? last line, or one past ? */
 			break;
 		}
 
@@ -231,7 +231,7 @@ ui_window * /* allocated and initialized ui_window * OR null */
 ui_setup(Buffer *buffer){
 	ui_window *uiw = calloc(1, sizeof(*uiw));
 	if( ! uiw )
-		return 0; /* FIXME TODO XXX error with malloc, crap */
+		return 0; /* FIXME TODO XXX error with calloc, crap */
 
 	uiw->buf = buffer;
 	uiw->running = 1;
@@ -279,7 +279,7 @@ ui_setup(Buffer *buffer){
 	if( uiw->buf->path ){
 		/* \0 + strlen("ark ") + strlen(buf->path) */
 		int len = 1 + 4 + strlen(uiw->buf->path);
-		uiw->title = malloc( len );
+		uiw->title = calloc( len, sizeof(char) );
 		snprintf(uiw->title, len, "ark %s", uiw->buf->path);
 	} else
 		uiw->title = "ark";

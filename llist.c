@@ -1,11 +1,61 @@
 #include <stdio.h> /* perror */
-#include <stdlib.h> /* malloc, realloc */
+#include <stdlib.h> /* calloc, realloc */
 #include <string.h> /* strlen, memmove */
 
 #include "llist.h"
 #include "config.h"
 
 #define BUFSIZE 80
+
+/* insert item after pre and before next,
+ * return 0 on success and 1 on failure */
+int ll_insert(void *item, void *prev, void *next){
+	ll_remove(item);
+	Llist *li = item;
+	Llist *lp = prev;
+	Llist *ln = next;
+
+	if( ! li ) return 1;
+
+	if( lp )
+		lp->next = li;
+	if( ln )
+		ln->prev = li;
+
+	li->prev = lp;
+	li->next = ln;
+	return 0;
+}
+/* remove node, linking node->prev and node->next
+ * returns 0 on success and 1 on failure */
+int ll_remove(void *node){
+	Llist *li = node;
+	if( ! li ) return 1;
+	if( !li->next && !li->prev ) return 1; /* nothing to remove from */
+
+	if( li->prev )
+		li->prev->next = li->next;
+	if( li->next )
+		li->next->prev = li->prev;
+
+	/* some nice tidying up, makes sure that ln doesn't think it's still in the list */
+	li->next = 0;
+	li->prev = 0;
+	return 0;
+}
+/* returns previous node or 0*/
+void * ll_prev(void *node){
+	Llist *ln = node;
+	return ln->prev;
+}
+/* returns next node or 0 */
+void * ll_next(void *node){
+	Llist *ln = node;
+	return ln->next;
+}
+
+
+/** --- below this line needs to be moved --- **/
 
 static int /* return 1 if item breaks a word, otherwise return 0 */
 wordbreak(char ch){
@@ -30,27 +80,28 @@ wordbreak(char ch){
 
 Line*
 newline(int mul, Line *prev, Line *next){
-	Line *l = malloc(sizeof(Line));
+	Line *l = calloc(1, sizeof(Line));
 	if( !l ){
-		perror("Failed to malloc in llist:newline for l ");
+		perror("Failed to calloc in llist:newline for l ");
 		return 0; /* error */
 	}
-	l->prev = prev;
-	l->next = next;
+	if( ll_insert(l, prev, next) ){
+		perror("Failed to insert a line in llist:newline for l ");
+		return 0;
+	}
 	l->mul = mul;
 	l->len = 0;
-	l->con = malloc( sizeof(char) * LINESIZE * mul );
+	l->con = calloc(LINESIZE * mul,  sizeof(char));
 	if( ! l->con ){
-		perror("Failed to malloc in llist:newline for l->con ");
+		perror("Failed to calloc in llist:newline for l->con ");
 		return 0; /* error */
 	}
-	l->con[0] = 0;
 	return l;
 }
 
 Buffer*
 newbuffer(char *path){
-	Buffer *b = malloc(sizeof(Buffer));
+	Buffer *b = calloc(1, sizeof(Buffer));
 	if( !b ){
 		perror("Failed to ammloc in llist:newfile for b ");
 		return 0; /* error */
@@ -89,8 +140,8 @@ m_endoffile(Buffer *buf){
 void
 m_prevchar(Buffer *buf){
 	if( --buf->cur.offset < 0 ){
-		if( buf->cur.line->prev ){
-			buf->cur.line = buf->cur.line->prev;
+		if( ll_prev(buf->cur.line) ){
+			buf->cur.line = ll_prev(buf->cur.line);
 			buf->cur.offset = buf->cur.line->len;
 		} else {
 			buf->cur.offset = 0;
@@ -101,8 +152,8 @@ m_prevchar(Buffer *buf){
 void
 m_nextchar(Buffer *buf){
 	if( ++buf->cur.offset > buf->cur.line->len ){
-		if( buf->cur.line->next ){
-			buf->cur.line = buf->cur.line->next;
+		if( ll_next(buf->cur.line) ){
+			buf->cur.line = ll_next(buf->cur.line);
 			buf->cur.offset = 0;
 		} else {
 			buf->cur.offset = buf->cur.line->len;
@@ -112,20 +163,20 @@ m_nextchar(Buffer *buf){
 
 void
 m_prevline(Buffer *buf){
-	if( ! buf->cur.line->prev )
+	if( ! ll_prev(buf->cur.line) )
 		return;
 	int vo = i_to_vo(buf->cur.line, buf->cur.offset);
-	buf->cur.line = buf->cur.line->prev;
+	buf->cur.line = ll_prev(buf->cur.line);
 	int i = vo_to_i(buf->cur.line, vo);
 	buf->cur.offset = i;
 }
 
 void
 m_nextline(Buffer *buf){
-	if( ! buf->cur.line->next )
+	if( ! ll_next(buf->cur.line) )
 		return;
 	int vo = i_to_vo(buf->cur.line, buf->cur.offset);
-	buf->cur.line = buf->cur.line->next;
+	buf->cur.line = ll_next(buf->cur.line);
 	int i = vo_to_i(buf->cur.line, vo);
 	buf->cur.offset = i;
 }
@@ -154,8 +205,8 @@ void
 m_scrolldown(Buffer *buf){
 	int i;
 	for( i=0; i<scrolldistance; ++i ){
-		if( buf->s_start->next )
-			buf->s_start = buf->s_start->next;
+		if( ll_next(buf->s_start) )
+			buf->s_start = ll_next(buf->s_start);
 		else
 			break;
 	}
@@ -165,14 +216,13 @@ void
 m_scrollup(Buffer *buf){
 	int i;
 	for( i=0; i<scrolldistance; ++i ){
-		if( buf->s_start->prev )
-			buf->s_start = buf->s_start->prev;
+		if( ll_prev(buf->s_start) )
+			buf->s_start = ll_prev(buf->s_start);
 		else
 			break;
 	}
-
 }
-/** llist functions **/
+
 int
 vo_to_i(Line *l, int voffset){
 	int i, vo;
@@ -216,7 +266,7 @@ position_cursor(Buffer *buf, int linenum, int voffset){
 	if( ! buf->s_start )
 		return;
 
-	for( l=buf->s_start; linenum && l; --linenum, l=l->next ) ;
+	for( l=buf->s_start; linenum && l; --linenum, l=ll_next(l) ) ;
 
 	if( !l ){
 		buf->cur.line = buf->end;
@@ -240,17 +290,17 @@ backspace(Buffer *buf){
 		ol = buf->cur.line;
 
 		/* insert line at end of previous line, correct links, free */
-		if( ! ol->prev )
+		if( ! ll_prev(ol) )
 			return; /* cannot delete the first line */
 
-		buf->cur.line = ol->prev;
+		buf->cur.line = ll_prev(ol);
 		buf->cur.offset = buf->cur.line->len;
 		insert(buf, &ol->con[oo]);
 
-		/* remove links */
-		ol->prev->next = ol->next;
-		if( ol->next )
-			ol->next->prev = ol->prev;
+		if( ll_remove(ol) ){
+			perror("ll_remove failed in backspace for ol ");
+			return;
+		}
 		free( ol->con );
 		free(ol);
 		return;
@@ -260,7 +310,6 @@ backspace(Buffer *buf){
 	--buf->cur.line->len;
 	--buf->cur.offset;
 }
-
 int /* load file buf->path into buf, returns 0 on success and 1 on error */
 load(Buffer *buf){
 	int read; /* returned by fread */
@@ -302,9 +351,9 @@ save(Buffer *buf){
 		perror("Failed to open buf->path in llist:save ");
 		return 1; /* error */
 	}
-	for( l=buf->start ; l; l=l->next ){
+	for( l=buf->start ; l; l=ll_next(l) ){
 		fwrite(l->con, sizeof(char), l->len, f);
-		if( l->next ) /* only append newline if there is a line following */
+		if( ll_next(l) ) /* only append newline if there is a line following */
 			fwrite("\n", sizeof(char), 1, f);
 	}
 	fclose(f);
@@ -332,14 +381,12 @@ insert(Buffer *buf, const char *str){
 		}
 		/* handle newline in string, should not be inserted */
 		if( str[i] == '\n' || str[i] == '\r' ){
-			nl = newline(1, buf->cur.line, buf->cur.line->next);
+			nl = newline(1, buf->cur.line, ll_next(buf->cur.line));
 			if( ! nl ){
 				perror("Failed call to newline from llist:insert ");
 				return 1; /* FIXME error */
 			}
-			if( buf->cur.line->next )
-				buf->cur.line->next->prev = nl;
-			buf->cur.line->next = nl;
+			//ll_insert(nl, buf->cur.line, ll_next(buf->cur.line));
 
 			/* old line */
 			ol = buf->cur.line;
@@ -370,4 +417,5 @@ insert(Buffer *buf, const char *str){
 	buf->end = nl;
 	return 0;
 }
+
 

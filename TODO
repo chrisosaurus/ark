@@ -12,6 +12,10 @@ technical debt:
 	maintaining buf->end on backspace (across lines)
 	cursor movement off screen should adjust visible sections - cursor should always be on screen
 	bindings now (after new input handling) has to take shift into account twice, once in mods (|SHIFT) and once in key (XK_Q instead of XK_q) (NB: there is always 32 difference between UC nad LC, could check for ShiftMask in mods and check value of keys, and silently convert)
+	LINESIZE is declared in line.c and buffer.c, should only be in line.c (make a line_insert function)
+	make errors more descriptive, perror + snprintf should be sufficient
+	shouldn't have specific rules in Makefile for making .def.h to .h, instead can make one conversion rule (see .c=.o)
+	include mess, should have a clear heirachy for deps (should .h files be allowed to include other .h files?)
 
 consider:
 	see tour.golang.org for a nice editor, when pasting the text is set to have the same indentation as the surrounding code.

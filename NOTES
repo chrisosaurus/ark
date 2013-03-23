@@ -23,4 +23,30 @@ llist.h and .c define a linked list, this is purely a model
 ark.h and .c define the editor, it's commands, main functions, setup and teardown
 ui.h and .c define the mainloop, command bindings, and event handlers
 
+========
+ark.[ch]     internal functions operating on buffers
+bindings.h   user key/mouse binding config
+buffer.[ch]  a view onto a file, a set of lines & spans.
+config.h     general user config
+line.[ch]    a llist of char *, len and cap
+llist.[ch]   a generic linked list
+main.c       main loop
+span.[ch]    llist of styles, referring to lines
+styles.h     user style config
+ui.[ch]      user interface components
+
+goal dep graph, deps go downwards or use arrows `<-`
+
+          main
+          /   \
+        ark <- ui ----> bindings, ui_config
+          \   /
+          buffer
+          /   \
+       line <- span
+          \   /
+          llist
+
+where ark -> ui is used only for dispatcing of keypresses (via bindings)
+and span -> line is due to span referring to lines via positions
 

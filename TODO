@@ -5,6 +5,7 @@ features:
 		- make the magic happen (modify ui drawing loop)
 	ui mouse select
 	should be able to create new files
+    see dwm CLEANMASK for how to remove things like numlock and scrolllock (as we dont want them affecting bindings)
 
 technical debt:
 	line wrap - currently cursor and line go off screen.
